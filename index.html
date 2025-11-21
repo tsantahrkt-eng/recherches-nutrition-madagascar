@@ -33,13 +33,15 @@
       margin-bottom: 20px;
     }
 
-    .card {
-      background: #ffffff;
-      border-radius: 12px;
-      padding: 16px 18px;
-      box-shadow: 0 10px 25px rgba(15, 23, 42, 0.08);
-      margin-bottom: 18px;
-    }
+   .card {
+  background: #ffffff;
+  border-radius: 12px;
+  padding: 16px 18px;
+  margin-bottom: 18px;
+  border-left: 5px solid #2f855a; /* discret, harmonieux */
+  box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+}
+
 
     .card-header {
       display: flex;
@@ -55,15 +57,9 @@
     }
 
     .badge {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      padding: 4px 10px;
-      border-radius: 999px;
-      font-size: 0.8rem;
-      background: #eef2ff;
-      color: #3730a3;
-    }
+  background: #def7ec;
+  color: #276749;
+}
 
     .badge span {
       font-weight: 600;
@@ -142,9 +138,15 @@
     }
 
     .btn-primary {
-      background: #4f46e5;
-      color: #ffffff;
-    }
+  background: #2f855a;
+  color: #ffffff;
+  border: none;
+  transition: background 0.2s;
+}
+
+.btn-primary:hover {
+  background: #276749;
+}
 
     .btn-secondary {
       background: #e5e7eb;
@@ -273,7 +275,7 @@
 </head>
 <body>
 <div class="app-container">
-  <h1>Inventaire des recherches en nutrition à Madagascar</h1>
+ <h1 style="color:#22543d;">Inventaire des recherches en nutrition à Madagascar</h1>
   <p class="subtitle">
     Application locale pour recenser les travaux, les équipes impliquées, les produits issus des recherches et leur potentiel de vulgarisation.
   </p>
