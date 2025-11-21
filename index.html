@@ -25,7 +25,7 @@
     h1 {
       font-size: 1.8rem;
       margin-bottom: 4px;
-      color: #22543d; /* harmonisation Mikasa */
+      color: #22543d;
     }
 
     .subtitle {
@@ -34,13 +34,12 @@
       margin-bottom: 20px;
     }
 
-    /* ---- CARDS ---- */
     .card {
       background: #ffffff;
       border-radius: 12px;
       padding: 16px 18px;
       margin-bottom: 18px;
-      border-left: 5px solid #2f855a; /* discret, Mikasa */
+      border-left: 5px solid #2f855a;
       box-shadow: 0 4px 10px rgba(0,0,0,0.05);
     }
 
@@ -57,7 +56,6 @@
       font-size: 1.05rem;
     }
 
-    /* ---- BADGE ---- */
     .badge {
       display: inline-flex;
       align-items: center;
@@ -65,7 +63,7 @@
       padding: 4px 10px;
       border-radius: 999px;
       font-size: 0.8rem;
-      background: #def7ec; /* vert clair Mikasa */
+      background: #def7ec;
       color: #276749;
     }
 
@@ -133,7 +131,6 @@
       margin-top: 6px;
     }
 
-    /* ---- BUTTONS ---- */
     button {
       border-radius: 999px;
       border: none;
@@ -265,6 +262,20 @@
       padding: 12px 0;
     }
 
+    .products-group {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px 16px;
+      margin-bottom: 6px;
+    }
+
+    .checkbox-inline {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 0.85rem;
+    }
+
     @media (max-width: 768px) {
       .card {
         padding: 12px 12px;
@@ -293,7 +304,7 @@
   <div class="card">
     <div class="card-header">
       <div class="card-title">Nouvelle recherche / Modifier une fiche</div>
-      <div class="badge"><span id="entry-count">0</span> fiche(s)</div>
+      <div class="badge"><span id="entry-count">0</span> fiche(s) enregistrée(s)</div>
     </div>
 
     <form id="study-form">
@@ -301,42 +312,45 @@
 
       <div class="field full-width">
         <label for="title">Titre de la recherche</label>
-        <input id="title" type="text" required placeholder="Ex. État nutritionnel des enfants..." />
+        <input id="title" type="text" required
+               placeholder="Ex. État nutritionnel des enfants de moins de 5 ans dans …" />
       </div>
 
       <div class="field">
-        <label for="institution">Institution / organisme</label>
-        <input id="institution" type="text" />
+        <label for="institution">Institution / organisme porteur</label>
+        <input id="institution" type="text"
+               placeholder="Université, centre de recherche, ONG, ministère, etc." />
       </div>
 
       <div class="field">
         <label for="year">Année</label>
-        <input id="year" type="number" min="1950" max="2100" />
+        <input id="year" type="number" min="1950" max="2100" placeholder="2023" />
       </div>
 
       <div class="field">
         <label for="author">Auteur principal</label>
-        <input id="author" type="text" />
+        <input id="author" type="text" placeholder="Nom Prénom" />
       </div>
 
       <div class="field">
         <label for="coauthors">Co-auteurs</label>
-        <input id="coauthors" type="text" />
+        <input id="coauthors" type="text" placeholder="Noms séparés par des virgules" />
       </div>
 
       <div class="field">
-        <label for="email">Email</label>
-        <input id="email" type="email" />
+        <label for="email">Contact email</label>
+        <input id="email" type="email" placeholder="auteur@institution.mg" />
       </div>
 
       <div class="field">
-        <label for="phone">Téléphone</label>
-        <input id="phone" type="tel" />
+        <label for="phone">Contact téléphone</label>
+        <input id="phone" type="tel" placeholder="+261 …" />
       </div>
 
       <div class="field">
-        <label for="domain">Domaine</label>
-        <input id="domain" type="text" />
+        <label for="domain">Domaine / thématique</label>
+        <input id="domain" type="text"
+               placeholder="Micronutriments, sécurité alimentaire, fortification, etc." />
       </div>
 
       <div class="field">
@@ -344,36 +358,89 @@
         <select id="type">
           <option value="">Non précisé</option>
           <option>Enquête transversale</option>
-          <option>Étude longitudinale</option>
-          <option>Essai clinique</option>
-          <option>Expérimentation</option>
-          <option>Analyse documentaire</option>
+          <option>Étude de cohorte</option>
+          <option>Étude cas-témoins</option>
+          <option>Essai clinique individuel</option>
+          <option>Essai communautaire / programme</option>
+          <option>Étude qualitative</option>
+          <option>Méthodes mixtes</option>
+          <option>Revue narrative</option>
+          <option>Revue systématique / méta-analyse</option>
+          <option>Analyse de politiques / documentaire</option>
+          <option value="Autre">Autre type</option>
         </select>
       </div>
 
-      <div class="field">
-        <label for="region">Zone</label>
-        <input id="region" type="text" />
+      <div class="field" id="type-other-container" style="display:none;">
+        <label for="type-other">Précision si autre type</label>
+        <input id="type-other" type="text" placeholder="Préciser le type de recherche" />
       </div>
 
       <div class="field">
-        <label for="target">Groupe cible</label>
-        <input id="target" type="text" />
+        <label for="region">Zone / région d’étude</label>
+        <input id="region" type="text"
+               placeholder="Ex. Analamanga, Atsinanana, national, rural/urbain…" />
+      </div>
+
+      <div class="field">
+        <label for="target">Population / groupe cible</label>
+        <input id="target" type="text"
+               placeholder="Enfants, femmes en âge de procréer, ménages ruraux, etc." />
       </div>
 
       <div class="field full-width">
         <label for="keywords">Mots-clés</label>
-        <input id="keywords" type="text" />
+        <input id="keywords" type="text"
+               placeholder="Séparés par des virgules : malnutrition, vitamine A, sécurité alimentaire…" />
       </div>
 
       <div class="field full-width">
-        <label for="summary">Résumé</label>
-        <textarea id="summary"></textarea>
+        <label for="summary">Résumé / grandes lignes</label>
+        <textarea id="summary"
+                  placeholder="Objectifs, méthodologie, principaux résultats, implications…"></textarea>
       </div>
 
+      <!-- PRODUITS DÉVELOPPÉS -->
       <div class="field full-width">
-        <label for="products">Produits développés</label>
-        <textarea id="products"></textarea>
+        <label>Produits développés</label>
+        <div class="products-group">
+          <label class="checkbox-inline">
+            <input type="checkbox" class="product-checkbox" value="Article scientifique" />
+            Article scientifique
+          </label>
+          <label class="checkbox-inline">
+            <input type="checkbox" class="product-checkbox" value="Mémoire ou thèse" />
+            Mémoire ou thèse
+          </label>
+          <label class="checkbox-inline">
+            <input type="checkbox" class="product-checkbox" value="Rapport technique / bailleur" />
+            Rapport technique / bailleur
+          </label>
+          <label class="checkbox-inline">
+            <input type="checkbox" class="product-checkbox" value="Base de données" />
+            Base de données
+          </label>
+          <label class="checkbox-inline">
+            <input type="checkbox" class="product-checkbox" value="Guide ou manuel de vulgarisation" />
+            Guide / manuel de vulgarisation
+          </label>
+          <label class="checkbox-inline">
+            <input type="checkbox" class="product-checkbox" value="Outil de suivi / protocole" />
+            Outil de suivi / protocole
+          </label>
+          <label class="checkbox-inline">
+            <input type="checkbox" class="product-checkbox" value="Produit ou formulation alimentaire" />
+            Produit / formulation alimentaire
+          </label>
+          <label class="checkbox-inline">
+            <input type="checkbox" class="product-checkbox" value="Programme ou module de formation" />
+            Programme / module de formation
+          </label>
+        </div>
+        <label for="products-other">Autre (préciser)</label>
+        <input id="products-other" type="text" placeholder="Autres produits ou précisions" />
+        <!-- champ caché utilisé pour stocker la valeur finale -->
+        <textarea id="products" style="display:none;"></textarea>
       </div>
 
       <div class="field">
@@ -389,28 +456,32 @@
       </div>
 
       <div class="field">
-        <label for="dissemination-notes">Commentaire</label>
-        <textarea id="dissemination-notes"></textarea>
+        <label for="dissemination-notes">Commentaire sur le potentiel</label>
+        <textarea id="dissemination-notes"
+                  placeholder="Conditions de diffusion, freins, partenaires possibles…"></textarea>
       </div>
 
       <div class="field full-width">
-        <label for="communications">Communications scientifiques</label>
-        <textarea id="communications"></textarea>
+        <label for="communications">Communications scientifiques déjà effectuées</label>
+        <textarea id="communications"
+                  placeholder="Articles, conférences, posters, rapports pour bailleurs, etc."></textarea>
       </div>
 
       <div class="field full-width">
-        <label for="links">Liens</label>
-        <textarea id="links"></textarea>
+        <label for="links">Liens vers les documents</label>
+        <textarea id="links"
+                  placeholder="URLs ou références : https://…, dépôt institutionnel, DOI, etc."></textarea>
       </div>
 
       <div class="field full-width">
-        <label for="other">Autres informations</label>
-        <textarea id="other"></textarea>
+        <label for="other">Autres informations pertinentes</label>
+        <textarea id="other"
+                  placeholder="Partenaires, financement, statut (en cours / terminé), remarques diverses…"></textarea>
       </div>
 
       <div class="actions-row full-width">
-        <button type="button" class="btn-secondary" id="reset-btn">Réinitialiser</button>
-        <button type="submit" class="btn-primary" id="submit-btn">Enregistrer</button>
+        <button type="button" class="btn-secondary" id="reset-btn">Réinitialiser le formulaire</button>
+        <button type="submit" class="btn-primary" id="submit-btn">Enregistrer la fiche</button>
       </div>
     </form>
   </div>
@@ -418,12 +489,13 @@
   <!-- TABLEAU -->
   <div class="card">
     <div class="card-header">
-      <div class="card-title">Liste des recherches</div>
+      <div class="card-title">Liste des recherches inventorées</div>
     </div>
 
     <div id="search-bar-container">
-      <input id="search-input" type="text" placeholder="Rechercher par mot-clé, auteur, titre..." />
-      <span class="hint">Filtre texte</span>
+      <input id="search-input" type="text"
+             placeholder="Filtrer par titre, institution, auteur, mots-clés, zone, type..." />
+      <span class="hint">Filtrage plein texte sur les colonnes principales.</span>
     </div>
 
     <div style="overflow-x: auto; max-height: 420px; margin-top: 6px;">
@@ -435,7 +507,7 @@
           <th>Auteurs</th>
           <th>Année</th>
           <th>Type</th>
-          <th>Zone</th>
+          <th>Zone / cible</th>
           <th>Potentiel</th>
           <th>Liens</th>
           <th class="col-actions">Actions</th>
@@ -445,7 +517,6 @@
       </table>
     </div>
   </div>
-
 </div>
 
 <script>
@@ -476,13 +547,29 @@
       target: document.getElementById("target"),
       keywords: document.getElementById("keywords"),
       summary: document.getElementById("summary"),
-      products: document.getElementById("products"),
+      products: document.getElementById("products"), // caché
       disseminationPotential: document.getElementById("dissemination-potential"),
       disseminationNotes: document.getElementById("dissemination-notes"),
       communications: document.getElementById("communications"),
       links: document.getElementById("links"),
       other: document.getElementById("other"),
     };
+
+    const typeOtherInput = document.getElementById("type-other");
+    const typeOtherContainer = document.getElementById("type-other-container");
+    const productCheckboxes = document.querySelectorAll(".product-checkbox");
+    const productsOtherInput = document.getElementById("products-other");
+
+    function toggleTypeOther() {
+      if (fields.type.value === "Autre") {
+        typeOtherContainer.style.display = "block";
+      } else {
+        typeOtherContainer.style.display = "none";
+        typeOtherInput.value = "";
+      }
+    }
+
+    fields.type.addEventListener("change", toggleTypeOther);
 
     function loadFromStorage() {
       try {
@@ -501,29 +588,21 @@
     function clearForm() {
       form.reset();
       editIndexInput.value = "-1";
-      submitBtn.textContent = "Enregistrer";
+      submitBtn.textContent = "Enregistrer la fiche";
+      productCheckboxes.forEach(cb => cb.checked = false);
+      productsOtherInput.value = "";
+      toggleTypeOther();
     }
 
-    function onEdit(index) {
-      const study = studies[index];
-      if (!study) return;
-
-      for (const key in fields) {
-        fields[key].value = study[key] || "";
-      }
-
-      editIndexInput.value = index;
-      submitBtn.textContent = "Mettre à jour";
-      window.scrollTo({ top: 0, behavior: "smooth" });
-    }
-
-    function onDelete(index) {
-      const study = studies[index];
-      if (!study) return;
-      if (confirm("Supprimer cette fiche ?")) {
-        studies.splice(index, 1);
-        saveToStorage();
-        renderTable();
+    function potentialLabel(value) {
+      const v = parseInt(value, 10);
+      switch (v) {
+        case 1: return "Faible";
+        case 2: return "Modéré";
+        case 3: return "Bon";
+        case 4: return "Très bon";
+        case 5: return "Excellent";
+        default: return "";
       }
     }
 
@@ -531,11 +610,6 @@
       if (!text) return "";
       if (text.length <= max) return text;
       return text.slice(0, max - 1) + "…";
-    }
-
-    function potentialLabel(value) {
-      const v = parseInt(value, 10);
-      return ["", "Faible", "Modéré", "Bon", "Très bon", "Excellent"][v];
     }
 
     function escapeHtml(str) {
@@ -552,33 +626,121 @@
       });
     }
 
+    function buildProductsString() {
+      const selected = Array.from(productCheckboxes)
+        .filter(cb => cb.checked)
+        .map(cb => cb.value.trim());
+      const otherVal = productsOtherInput.value.trim();
+      if (otherVal) selected.push(otherVal);
+      return selected.join(" | ");
+    }
+
+    function populateProductsFromString(text) {
+      productCheckboxes.forEach(cb => cb.checked = false);
+      productsOtherInput.value = "";
+      if (!text) return;
+      const parts = text.split("|").map(p => p.trim()).filter(Boolean);
+      const leftovers = [];
+      parts.forEach(p => {
+        const match = Array.from(productCheckboxes).find(cb => cb.value === p);
+        if (match) {
+          match.checked = true;
+        } else {
+          leftovers.push(p);
+        }
+      });
+      if (leftovers.length) {
+        productsOtherInput.value = leftovers.join(" ; ");
+      }
+    }
+
+    function populateType(studyType) {
+      const options = Array.from(fields.type.options).map(o => o.value || o.textContent);
+      if (!studyType) {
+        fields.type.value = "";
+        typeOtherInput.value = "";
+        toggleTypeOther();
+        return;
+      }
+      if (options.includes(studyType)) {
+        fields.type.value = studyType;
+        typeOtherInput.value = "";
+      } else {
+        fields.type.value = "Autre";
+        typeOtherInput.value = studyType;
+      }
+      toggleTypeOther();
+    }
+
+    function populateForm(study) {
+      fields.title.value = study.title || "";
+      fields.institution.value = study.institution || "";
+      fields.year.value = study.year || "";
+      fields.author.value = study.author || "";
+      fields.coauthors.value = study.coauthors || "";
+      fields.email.value = study.email || "";
+      fields.phone.value = study.phone || "";
+      fields.domain.value = study.domain || "";
+      fields.region.value = study.region || "";
+      fields.target.value = study.target || "";
+      fields.keywords.value = study.keywords || "";
+      fields.summary.value = study.summary || "";
+      fields.disseminationPotential.value = study.disseminationPotential || "";
+      fields.disseminationNotes.value = study.disseminationNotes || "";
+      fields.communications.value = study.communications || "";
+      fields.links.value = study.links || "";
+      fields.other.value = study.other || "";
+
+      populateType(study.type || "");
+      populateProductsFromString(study.products || "");
+    }
+
+    function onEdit(index) {
+      const study = studies[index];
+      if (!study) return;
+      populateForm(study);
+      editIndexInput.value = index;
+      submitBtn.textContent = "Mettre à jour la fiche";
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+
+    function onDuplicate(index) {
+      const study = studies[index];
+      if (!study) return;
+      populateForm(study);
+      editIndexInput.value = "-1";
+      submitBtn.textContent = "Enregistrer la fiche";
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+
+    function onDelete(index) {
+      const study = studies[index];
+      if (!study) return;
+      if (confirm("Supprimer cette fiche ?\n\n" + (study.title || "Sans titre"))) {
+        studies.splice(index, 1);
+        saveToStorage();
+        renderTable();
+      }
+    }
+
     function renderTable() {
       tbody.innerHTML = "";
-      entryCountSpan.textContent = studies.length;
+      entryCountSpan.textContent = studies.length.toString();
 
       const filter = (searchInput.value || "").toLowerCase().trim();
 
       const filtered = studies.filter((s) => {
         if (!filter) return true;
         const text =
-          (s.title || "") +
-          " " +
-          (s.institution || "") +
-          " " +
-          (s.author || "") +
-          " " +
-          (s.coauthors || "") +
-          " " +
-          (s.domain || "") +
-          " " +
-          (s.type || "") +
-          " " +
-          (s.region || "") +
-          " " +
-          (s.target || "") +
-          " " +
-          (s.keywords || "") +
-          " " +
+          (s.title || "") + " " +
+          (s.institution || "") + " " +
+          (s.author || "") + " " +
+          (s.coauthors || "") + " " +
+          (s.domain || "") + " " +
+          (s.type || "") + " " +
+          (s.region || "") + " " +
+          (s.target || "") + " " +
+          (s.keywords || "") + " " +
           (s.summary || "");
         return text.toLowerCase().includes(filter);
       });
@@ -588,7 +750,7 @@
         const td = document.createElement("td");
         td.colSpan = 9;
         td.className = "no-data";
-        td.textContent = "Aucune fiche ne correspond au filtre.";
+        td.textContent = "Aucune fiche ne correspond à ce filtre pour le moment.";
         tr.appendChild(td);
         tbody.appendChild(tr);
         return;
@@ -600,11 +762,10 @@
 
         const tdTitle = document.createElement("td");
         tdTitle.innerHTML =
-          "<strong>" +
-          escapeHtml(study.title || "Sans titre") +
-          "</strong><br/><span class='small-text'>" +
-          escapeHtml(truncate(study.summary, 120)) +
-          "</span>";
+          "<strong>" + escapeHtml(study.title || "Sans titre") + "</strong>" +
+          (study.summary
+            ? "<br/><span class='small-text'>" + escapeHtml(truncate(study.summary, 120)) + "</span>"
+            : "");
         tr.appendChild(tdTitle);
 
         const tdInst = document.createElement("td");
@@ -616,10 +777,14 @@
           escapeHtml(study.author || "") +
           (study.coauthors
             ? "<br/><span class='small-text'>" + escapeHtml(study.coauthors) + "</span>"
+            : "") +
+          (study.email
+            ? "<br/><span class='small-text'>" + escapeHtml(study.email) + "</span>"
             : "");
         tr.appendChild(tdAuthors);
 
         const tdYear = document.createElement("td");
+        tdYear.className = "nowrap";
         tdYear.textContent = study.year || "";
         tr.appendChild(tdYear);
 
@@ -627,20 +792,21 @@
         tdType.textContent = study.type || "";
         tr.appendChild(tdType);
 
-        const tdRegion = document.createElement("td");
-        tdRegion.innerHTML =
+        const tdRegionTarget = document.createElement("td");
+        tdRegionTarget.innerHTML =
           escapeHtml(study.region || "") +
           (study.target
             ? "<br/><span class='small-text'>" + escapeHtml(study.target) + "</span>"
             : "");
-        tr.appendChild(tdRegion);
+        tr.appendChild(tdRegionTarget);
 
         const tdPotential = document.createElement("td");
         if (study.disseminationPotential) {
           tdPotential.innerHTML =
-            "<span class='pill'>" +
-            escapeHtml(potentialLabel(study.disseminationPotential)) +
-            "</span>";
+            "<span class='pill'>" + escapeHtml(potentialLabel(study.disseminationPotential)) + "</span>" +
+            (study.disseminationNotes
+              ? "<br/><span class='small-text'>" + escapeHtml(truncate(study.disseminationNotes, 80)) + "</span>"
+              : "");
         }
         tr.appendChild(tdPotential);
 
@@ -651,10 +817,18 @@
             const a = document.createElement("a");
             a.href = u;
             a.target = "_blank";
+            a.rel = "noopener noreferrer";
             a.textContent = "Lien " + (i + 1);
             a.style.display = "block";
+            a.style.fontSize = "0.78rem";
             tdLinks.appendChild(a);
           });
+          if (urls.length > 2) {
+            const span = document.createElement("span");
+            span.className = "small-text";
+            span.textContent = "+" + (urls.length - 2) + " autre(s)";
+            tdLinks.appendChild(span);
+          }
         }
         tr.appendChild(tdLinks);
 
@@ -662,16 +836,25 @@
         tdActions.className = "col-actions";
 
         const btnEdit = document.createElement("button");
+        btnEdit.type = "button";
         btnEdit.className = "btn-icon";
         btnEdit.textContent = "Éditer";
-        btnEdit.onclick = () => onEdit(realIndex);
+        btnEdit.addEventListener("click", () => onEdit(realIndex));
+
+        const btnCopy = document.createElement("button");
+        btnCopy.type = "button";
+        btnCopy.className = "btn-icon";
+        btnCopy.textContent = "Copier";
+        btnCopy.addEventListener("click", () => onDuplicate(realIndex));
 
         const btnDelete = document.createElement("button");
+        btnDelete.type = "button";
         btnDelete.className = "btn-icon btn-danger";
         btnDelete.textContent = "Supprimer";
-        btnDelete.onclick = () => onDelete(realIndex);
+        btnDelete.addEventListener("click", () => onDelete(realIndex));
 
         tdActions.appendChild(btnEdit);
+        tdActions.appendChild(btnCopy);
         tdActions.appendChild(btnDelete);
         tr.appendChild(tdActions);
 
@@ -682,13 +865,23 @@
     form.addEventListener("submit", function (e) {
       e.preventDefault();
 
+      // gérer type Autre
+      let typeValue = fields.type.value;
+      if (typeValue === "Autre") {
+        typeValue = typeOtherInput.value.trim() || "Autre (non précisé)";
+      }
+      fields.type.value = typeValue;
+
+      // gérer produits
+      fields.products.value = buildProductsString();
+
       const study = {};
       for (const key in fields) {
         study[key] = fields[key].value.trim();
       }
 
       const editIndex = parseInt(editIndexInput.value, 10);
-      if (editIndex >= 0) {
+      if (editIndex >= 0 && editIndex < studies.length) {
         studies[editIndex] = { ...studies[editIndex], ...study };
       } else {
         studies.push(study);
