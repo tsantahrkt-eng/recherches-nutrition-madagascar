@@ -234,6 +234,7 @@
       border-collapse: collapse;
       font-size: 0.82rem;
       margin-top: 8px;
+      font-family: Verdana, Geneva, sans-serif;
     }
 
     thead {
@@ -369,13 +370,11 @@
     }
 
     /* Stats */
-    .stats-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-      gap: 14px;
+    .stats-block {
+      margin-bottom: 16px;
     }
 
-    .stats-card-title {
+    .stats-title {
       font-size: 0.92rem;
       font-weight: 600;
       margin-bottom: 4px;
@@ -386,8 +385,6 @@
         padding: 12px 12px;
       }
 
-      th:nth-child(7),
-      td:nth-child(7),
       th:nth-child(8),
       td:nth-child(8) {
         display: none;
@@ -466,6 +463,18 @@
           <label for="domain">Domaine / thématique</label>
           <input id="domain" type="text"
                  placeholder="Micronutriments, sécurité alimentaire, fortification, etc." />
+        </div>
+
+        <div class="field">
+          <label for="filiere">Filière</label>
+          <input id="filiere" type="text"
+                 placeholder="Riz, maïs, manioc, produits laitiers, etc." />
+        </div>
+
+        <div class="field">
+          <label for="product_final">Produit final étudié</label>
+          <input id="product_final" type="text"
+                 placeholder="Produit spécifique, formulation, aliment ciblé…" />
         </div>
 
         <div class="field">
@@ -615,7 +624,7 @@
         <span class="hint">Filtrage plein texte sur les colonnes principales.</span>
       </div>
 
-      <div class="actions-row" style="margin-top:4px; justify-content:flex-start;">
+      <div class="actions-row" style="margin-top:4px; justify-content:flex-start; align-items:center;">
         <button type="button" class="btn-primary btn-small" id="export-excel-btn">
           Exporter Excel
         </button>
@@ -623,8 +632,21 @@
           Importer Excel
           <input type="file" id="import-excel-input" accept=".xlsx,.xls" style="display:none;" />
         </label>
+        <select id="import-mode" style="margin-left:6px; padding:4px 8px; font-size:0.8rem;">
+          <option value="append">Mode import : Grouper (ajouter)</option>
+          <option value="overwrite">Mode import : Écraser (remplacer)</option>
+        </select>
+      </div>
+
+      <div class="actions-row" style="margin-top:4px; justify-content:flex-start;">
+        <button type="button" class="btn-secondary btn-small" id="bulk-delete-btn">
+          Supprimer la sélection
+        </button>
+        <button type="button" class="btn-secondary btn-small" id="dedupe-btn">
+          Supprimer les doublons
+        </button>
         <span class="hint">
-          Pour l’import, la première ligne de la feuille doit contenir les noms de colonnes (titre, institution, année…).
+          Supprimer ou dédoublonner nécessite le code de validation : t1406
         </span>
       </div>
 
@@ -632,13 +654,15 @@
         <table>
           <thead>
           <tr>
+            <th><input type="checkbox" id="select-all" /></th>
             <th>Titre</th>
             <th>Institution</th>
             <th>Auteur(s)</th>
             <th>Année</th>
-            <th>Type</th>
+            <th>Filière</th>
+            <th>Produit final</th>
             <th>Zone / cible</th>
-            <th>Produits</th>
+            <th>Produits développés</th>
             <th>Potentiel</th>
             <th class="col-actions">Actions</th>
           </tr>
@@ -656,25 +680,47 @@
         <div class="card-title">Statistiques synthétiques</div>
       </div>
       <p class="hint" style="margin-bottom:10px;">
-        Les graphiques se mettent à jour automatiquement en fonction des fiches enregistrées.
+        Les tableaux se mettent à jour automatiquement en fonction des fiches enregistrées.
       </p>
-      <div class="stats-grid">
-        <div>
-          <div class="stats-card-title">Répartition par produit développé</div>
-          <canvas id="chart-products" height="180"></canvas>
-        </div>
-        <div>
-          <div class="stats-card-title">Répartition par région / zone</div>
-          <canvas id="chart-region" height="180"></canvas>
-        </div>
-        <div>
-          <div class="stats-card-title">Répartition par institution</div>
-          <canvas id="chart-institution" height="180"></canvas>
-        </div>
-        <div>
-          <div class="stats-card-title">Répartition par auteur principal</div>
-          <canvas id="chart-author" height="180"></canvas>
-        </div>
+
+      <div class="stats-block">
+        <div class="stats-title">Répartition par produit développé</div>
+        <table id="stats-products-table">
+          <thead>
+          <tr><th>Produit développé</th><th>Nombre de recherches</th></tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+
+      <div class="stats-block">
+        <div class="stats-title">Répartition par région / zone</div>
+        <table id="stats-region-table">
+          <thead>
+          <tr><th>Région / zone</th><th>Nombre de recherches</th></tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+
+      <div class="stats-block">
+        <div class="stats-title">Répartition par institution</div>
+        <table id="stats-institution-table">
+          <thead>
+          <tr><th>Institution</th><th>Nombre de recherches</th></tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+
+      <div class="stats-block">
+        <div class="stats-title">Répartition par auteur principal</div>
+        <table id="stats-author-table">
+          <thead>
+          <tr><th>Auteur principal</th><th>Nombre de recherches</th></tr>
+          </thead>
+          <tbody></tbody>
+        </table>
       </div>
     </div>
   </section>
@@ -693,678 +739,772 @@
   </div>
 </div>
 
-<!-- Librairies externes pour Excel & Graphiques (gratuites) -->
+<!-- Librairie Excel -->
 <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
 
 <script>
-  (function () {
-    const STORAGE_KEY = "nutritionStudiesMG";
+(function () {
+  const STORAGE_KEY = "nutritionStudiesMG";
 
-    let studies = [];
+  let studies = [];
 
-    // éléments principaux
-    const form = document.getElementById("study-form");
-    const editIndexInput = document.getElementById("edit-index");
-    const entryCountSpan = document.getElementById("entry-count");
-    const searchInput = document.getElementById("search-input");
-    const tbody = document.getElementById("studies-tbody");
-    const resetBtn = document.getElementById("reset-btn");
-    const submitBtn = document.getElementById("submit-btn");
+  // éléments principaux
+  const form = document.getElementById("study-form");
+  const editIndexInput = document.getElementById("edit-index");
+  const entryCountSpan = document.getElementById("entry-count");
+  const searchInput = document.getElementById("search-input");
+  const tbody = document.getElementById("studies-tbody");
+  const resetBtn = document.getElementById("reset-btn");
+  const submitBtn = document.getElementById("submit-btn");
 
-    const exportExcelBtn = document.getElementById("export-excel-btn");
-    const importExcelInput = document.getElementById("import-excel-input");
+  const exportExcelBtn = document.getElementById("export-excel-btn");
+  const importExcelInput = document.getElementById("import-excel-input");
+  const importModeSelect = document.getElementById("import-mode");
+  const bulkDeleteBtn = document.getElementById("bulk-delete-btn");
+  const dedupeBtn = document.getElementById("dedupe-btn");
+  const selectAllCheckbox = document.getElementById("select-all");
 
-    const fields = {
-      title: document.getElementById("title"),
-      institution: document.getElementById("institution"),
-      year: document.getElementById("year"),
-      author: document.getElementById("author"),
-      coauthors: document.getElementById("coauthors"),
-      email: document.getElementById("email"),
-      phone: document.getElementById("phone"),
-      domain: document.getElementById("domain"),
-      type: document.getElementById("type"),
-      region: document.getElementById("region"),
-      target: document.getElementById("target"),
-      keywords: document.getElementById("keywords"),
-      summary: document.getElementById("summary"),
-      products: document.getElementById("products"), // caché
-      disseminationPotential: document.getElementById("dissemination-potential"),
-      disseminationNotes: document.getElementById("dissemination-notes"),
-      communications: document.getElementById("communications"),
-      links: document.getElementById("links"),
-      other: document.getElementById("other"),
-    };
+  const fields = {
+    title: document.getElementById("title"),
+    institution: document.getElementById("institution"),
+    year: document.getElementById("year"),
+    author: document.getElementById("author"),
+    coauthors: document.getElementById("coauthors"),
+    email: document.getElementById("email"),
+    phone: document.getElementById("phone"),
+    domain: document.getElementById("domain"),
+    filiere: document.getElementById("filiere"),
+    product_final: document.getElementById("product_final"),
+    type: document.getElementById("type"),
+    region: document.getElementById("region"),
+    target: document.getElementById("target"),
+    keywords: document.getElementById("keywords"),
+    summary: document.getElementById("summary"),
+    products: document.getElementById("products"),
+    disseminationPotential: document.getElementById("dissemination-potential"),
+    disseminationNotes: document.getElementById("dissemination-notes"),
+    communications: document.getElementById("communications"),
+    links: document.getElementById("links"),
+    other: document.getElementById("other"),
+  };
 
-    const typeOtherInput = document.getElementById("type-other");
-    const typeOtherContainer = document.getElementById("type-other-container");
-    const productCheckboxes = document.querySelectorAll(".product-checkbox");
-    const productsOtherInput = document.getElementById("products-other");
+  const typeOtherInput = document.getElementById("type-other");
+  const typeOtherContainer = document.getElementById("type-other-container");
+  const productCheckboxes = document.querySelectorAll(".product-checkbox");
+  const productsOtherInput = document.getElementById("products-other");
 
-    // Modal détails
-    const detailModal = document.getElementById("detail-modal");
-    const detailGrid = document.getElementById("detail-grid");
-    const detailTitle = document.getElementById("detail-title");
-    const detailCloseBtn = document.getElementById("detail-close-btn");
+  // Modal détails
+  const detailModal = document.getElementById("detail-modal");
+  const detailGrid = document.getElementById("detail-grid");
+  const detailTitle = document.getElementById("detail-title");
+  const detailCloseBtn = document.getElementById("detail-close-btn");
 
-    // Onglets
-    const tabButtons = document.querySelectorAll(".tab-button");
-    const tabSections = document.querySelectorAll(".tab-section");
+  // Onglets
+  const tabButtons = document.querySelectorAll(".tab-button");
+  const tabSections = document.querySelectorAll(".tab-section");
 
-    // Graphiques
-    let chartProducts = null;
-    let chartRegion = null;
-    let chartInstitution = null;
-    let chartAuthor = null;
+  // Stats tables
+  const statsProductsTableBody = document.querySelector("#stats-products-table tbody");
+  const statsRegionTableBody = document.querySelector("#stats-region-table tbody");
+  const statsInstitutionTableBody = document.querySelector("#stats-institution-table tbody");
+  const statsAuthorTableBody = document.querySelector("#stats-author-table tbody");
 
-    function toggleTypeOther() {
-      if (fields.type.value === "Autre") {
-        typeOtherContainer.style.display = "block";
-      } else {
-        typeOtherContainer.style.display = "none";
-        typeOtherInput.value = "";
-      }
+  function toggleTypeOther() {
+    if (fields.type.value === "Autre") {
+      typeOtherContainer.style.display = "block";
+    } else {
+      typeOtherContainer.style.display = "none";
+      typeOtherInput.value = "";
     }
-    fields.type.addEventListener("change", toggleTypeOther);
+  }
+  fields.type.addEventListener("change", toggleTypeOther);
 
-    // Onglets
-    tabButtons.forEach(btn => {
-      btn.addEventListener("click", () => {
-        const tab = btn.getAttribute("data-tab");
-        tabButtons.forEach(b => b.classList.remove("active"));
-        tabSections.forEach(s => s.classList.remove("active"));
-        btn.classList.add("active");
-        document.getElementById("tab-" + tab).classList.add("active");
-      });
+  // Onglets
+  tabButtons.forEach(btn => {
+    btn.addEventListener("click", () => {
+      const tab = btn.getAttribute("data-tab");
+      tabButtons.forEach(b => b.classList.remove("active"));
+      tabSections.forEach(s => s.classList.remove("active"));
+      btn.classList.add("active");
+      document.getElementById("tab-" + tab).classList.add("active");
+    });
+  });
+
+  // LocalStorage
+  function loadFromStorage() {
+    try {
+      const raw = localStorage.getItem(STORAGE_KEY);
+      studies = raw ? JSON.parse(raw) : [];
+    } catch (e) {
+      studies = [];
+    }
+    renderTable();
+    renderStats();
+  }
+
+  function saveToStorage() {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(studies));
+  }
+
+  // Form
+  function clearForm() {
+    form.reset();
+    editIndexInput.value = "-1";
+    submitBtn.textContent = "Enregistrer la fiche";
+    productCheckboxes.forEach(cb => cb.checked = false);
+    productsOtherInput.value = "";
+    toggleTypeOther();
+  }
+
+  function potentialLabel(value) {
+    const v = parseInt(value, 10);
+    switch (v) {
+      case 1: return "Faible";
+      case 2: return "Modéré";
+      case 3: return "Bon";
+      case 4: return "Très bon";
+      case 5: return "Excellent";
+      default: return "";
+    }
+  }
+
+  function truncate(text, max) {
+    if (!text) return "";
+    if (text.length <= max) return text;
+    return text.slice(0, max - 1) + "…";
+  }
+
+  function escapeHtml(str) {
+    if (typeof str !== "string") return "";
+    return str.replace(/[&<>"']/g, function (tag) {
+      const chars = {
+        "&": "&amp;",
+        "<": "&lt;",
+        ">": "&gt;",
+        '"': "&quot;",
+        "'": "&#039;",
+      };
+      return chars[tag] || tag;
+    });
+  }
+
+  function buildProductsString() {
+    const selected = Array.from(productCheckboxes)
+      .filter(cb => cb.checked)
+      .map(cb => cb.value.trim());
+    const otherVal = productsOtherInput.value.trim();
+    if (otherVal) selected.push(otherVal);
+    return selected.join(" | ");
+  }
+
+  function populateProductsFromString(text) {
+    productCheckboxes.forEach(cb => cb.checked = false);
+    productsOtherInput.value = "";
+    if (!text) return;
+    const parts = text.split("|").map(p => p.trim()).filter(Boolean);
+    const leftovers = [];
+    parts.forEach(p => {
+      const match = Array.from(productCheckboxes).find(cb => cb.value === p);
+      if (match) {
+        match.checked = true;
+      } else {
+        leftovers.push(p);
+      }
+    });
+    if (leftovers.length) {
+      productsOtherInput.value = leftovers.join(" ; ");
+    }
+  }
+
+  function populateType(studyType) {
+    const possible = Array.from(fields.type.options).map(o => o.value || o.textContent);
+    if (!studyType) {
+      fields.type.value = "";
+      typeOtherInput.value = "";
+      toggleTypeOther();
+      return;
+    }
+    if (possible.includes(studyType)) {
+      fields.type.value = studyType;
+      typeOtherInput.value = "";
+    } else {
+      fields.type.value = "Autre";
+      typeOtherInput.value = studyType;
+    }
+    toggleTypeOther();
+  }
+
+  function populateForm(study) {
+    fields.title.value = study.title || "";
+    fields.institution.value = study.institution || "";
+    fields.year.value = study.year || "";
+    fields.author.value = study.author || "";
+    fields.coauthors.value = study.coauthors || "";
+    fields.email.value = study.email || "";
+    fields.phone.value = study.phone || "";
+    fields.domain.value = study.domain || "";
+    fields.filiere.value = study.filiere || "";
+    fields.product_final.value = study.product_final || "";
+    fields.region.value = study.region || "";
+    fields.target.value = study.target || "";
+    fields.keywords.value = study.keywords || "";
+    fields.summary.value = study.summary || "";
+    fields.disseminationPotential.value = study.disseminationPotential || "";
+    fields.disseminationNotes.value = study.disseminationNotes || "";
+    fields.communications.value = study.communications || "";
+    fields.links.value = study.links || "";
+    fields.other.value = study.other || "";
+    populateType(study.type || "");
+    populateProductsFromString(study.products || "");
+  }
+
+  function askValidationCode(actionLabel) {
+    const code = prompt("Code de validation requis pour " + actionLabel + " :");
+    if (code === null) return false;
+    if (code.trim() !== "t1406") {
+      alert("Code incorrect. Action annulée.");
+      return false;
+    }
+    return true;
+  }
+
+  function onEdit(index) {
+    const study = studies[index];
+    if (!study) return;
+    if (!askValidationCode("modifier cette fiche")) return;
+    populateForm(study);
+    editIndexInput.value = index;
+    submitBtn.textContent = "Mettre à jour la fiche";
+    window.scrollTo({ top: 0, behavior: "smooth" });
+    tabButtons.forEach(b => b.classList.remove("active"));
+    tabSections.forEach(s => s.classList.remove("active"));
+    document.querySelector('.tab-button[data-tab="form"]').classList.add("active");
+    document.getElementById("tab-form").classList.add("active");
+  }
+
+  function onDuplicate(index) {
+    const study = studies[index];
+    if (!study) return;
+    populateForm(study);
+    editIndexInput.value = "-1";
+    submitBtn.textContent = "Enregistrer la fiche";
+    window.scrollTo({ top: 0, behavior: "smooth" });
+    tabButtons.forEach(b => b.classList.remove("active"));
+    tabSections.forEach(s => s.classList.remove("active"));
+    document.querySelector('.tab-button[data-tab="form"]').classList.add("active");
+    document.getElementById("tab-form").classList.add("active");
+  }
+
+  function onDelete(index) {
+    const study = studies[index];
+    if (!study) return;
+    if (!askValidationCode("supprimer cette fiche")) return;
+    if (confirm("Supprimer cette fiche ?\n\n" + (study.title || "Sans titre"))) {
+      studies.splice(index, 1);
+      saveToStorage();
+      renderTable();
+      renderStats();
+    }
+  }
+
+  // Modal détails
+  function openDetailModal(index) {
+    const study = studies[index];
+    if (!study) return;
+    detailTitle.textContent = study.title || "Détails de la fiche";
+
+    const rows = [
+      ["Institution", study.institution],
+      ["Année", study.year],
+      ["Auteur principal", study.author],
+      ["Co-auteurs", study.coauthors],
+      ["Email", study.email],
+      ["Téléphone", study.phone],
+      ["Domaine / thématique", study.domain],
+      ["Filière", study.filiere],
+      ["Produit final étudié", study.product_final],
+      ["Type de recherche", study.type],
+      ["Zone / région d’étude", study.region],
+      ["Population / groupe cible", study.target],
+      ["Mots-clés", study.keywords],
+      ["Résumé / grandes lignes", study.summary],
+      ["Produits développés", study.products],
+      ["Potentiel de vulgarisation", potentialLabel(study.disseminationPotential)],
+      ["Commentaire sur le potentiel", study.disseminationNotes],
+      ["Communications scientifiques", study.communications],
+      ["Liens", study.links],
+      ["Autres informations", study.other],
+    ];
+
+    detailGrid.innerHTML = "";
+    rows.forEach(([label, value]) => {
+      const labelDiv = document.createElement("div");
+      labelDiv.className = "detail-label";
+      labelDiv.textContent = label;
+
+      const valueDiv = document.createElement("div");
+      valueDiv.className = "detail-value";
+      valueDiv.innerHTML = value ? escapeHtml(value).replace(/\n/g, "<br>") : "<span class='small-text'>—</span>";
+
+      detailGrid.appendChild(labelDiv);
+      detailGrid.appendChild(valueDiv);
     });
 
-    // LocalStorage
-    function loadFromStorage() {
-      try {
-        const raw = localStorage.getItem(STORAGE_KEY);
-        studies = raw ? JSON.parse(raw) : [];
-      } catch (e) {
+    detailModal.classList.add("show");
+  }
+
+  function closeDetailModal() {
+    detailModal.classList.remove("show");
+  }
+
+  detailCloseBtn.addEventListener("click", closeDetailModal);
+  detailModal.addEventListener("click", (e) => {
+    if (e.target === detailModal) closeDetailModal();
+  });
+
+  // Tableau
+  function renderTable() {
+    tbody.innerHTML = "";
+    entryCountSpan.textContent = studies.length.toString();
+    selectAllCheckbox.checked = false;
+
+    const filter = (searchInput.value || "").toLowerCase().trim();
+
+    const filtered = studies.filter((s) => {
+      if (!filter) return true;
+      const text =
+        (s.title || "") + " " +
+        (s.institution || "") + " " +
+        (s.author || "") + " " +
+        (s.coauthors || "") + " " +
+        (s.domain || "") + " " +
+        (s.filiere || "") + " " +
+        (s.product_final || "") + " " +
+        (s.type || "") + " " +
+        (s.region || "") + " " +
+        (s.target || "") + " " +
+        (s.keywords || "") + " " +
+        (s.summary || "") + " " +
+        (s.products || "");
+      return text.toLowerCase().includes(filter);
+    });
+
+    if (filtered.length === 0) {
+      const tr = document.createElement("tr");
+      const td = document.createElement("td");
+      td.colSpan = 11;
+      td.className = "no-data";
+      td.textContent = "Aucune fiche ne correspond à ce filtre pour le moment.";
+      tr.appendChild(td);
+      tbody.appendChild(tr);
+      return;
+    }
+
+    filtered.forEach((study) => {
+      const realIndex = studies.indexOf(study);
+      const tr = document.createElement("tr");
+
+      // sélection
+      const tdSelect = document.createElement("td");
+      const cb = document.createElement("input");
+      cb.type = "checkbox";
+      cb.className = "row-select";
+      cb.dataset.index = String(realIndex);
+      tdSelect.appendChild(cb);
+      tr.appendChild(tdSelect);
+
+      const tdTitle = document.createElement("td");
+      tdTitle.innerHTML =
+        "<strong>" + escapeHtml(study.title || "Sans titre") + "</strong>" +
+        (study.summary
+          ? "<br/><span class='small-text'>" + escapeHtml(truncate(study.summary, 80)) + "</span>"
+          : "");
+      tr.appendChild(tdTitle);
+
+      const tdInst = document.createElement("td");
+      tdInst.textContent = study.institution || "";
+      tr.appendChild(tdInst);
+
+      const tdAuthors = document.createElement("td");
+      tdAuthors.innerHTML =
+        escapeHtml(study.author || "") +
+        (study.coauthors
+          ? "<br/><span class='small-text'>" + escapeHtml(study.coauthors) + "</span>"
+          : "");
+      tr.appendChild(tdAuthors);
+
+      const tdYear = document.createElement("td");
+      tdYear.className = "nowrap";
+      tdYear.textContent = study.year || "";
+      tr.appendChild(tdYear);
+
+      const tdFiliere = document.createElement("td");
+      tdFiliere.textContent = study.filiere || "";
+      tr.appendChild(tdFiliere);
+
+      const tdProdFinal = document.createElement("td");
+      tdProdFinal.textContent = study.product_final || "";
+      tr.appendChild(tdProdFinal);
+
+      const tdRegionTarget = document.createElement("td");
+      tdRegionTarget.innerHTML =
+        escapeHtml(study.region || "") +
+        (study.target
+          ? "<br/><span class='small-text'>" + escapeHtml(study.target) + "</span>"
+          : "");
+      tr.appendChild(tdRegionTarget);
+
+      const tdProducts = document.createElement("td");
+      tdProducts.innerHTML = study.products
+        ? "<span class='small-text'>" + escapeHtml(truncate(study.products, 80)) + "</span>"
+        : "";
+      tr.appendChild(tdProducts);
+
+      const tdPotential = document.createElement("td");
+      if (study.disseminationPotential) {
+        tdPotential.innerHTML =
+          "<span class='pill'>" + escapeHtml(potentialLabel(study.disseminationPotential)) + "</span>";
+      }
+      tr.appendChild(tdPotential);
+
+      const tdActions = document.createElement("td");
+      tdActions.className = "col-actions";
+
+      const btnDetails = document.createElement("button");
+      btnDetails.type = "button";
+      btnDetails.className = "btn-icon btn-small";
+      btnDetails.textContent = "Détails";
+      btnDetails.addEventListener("click", () => openDetailModal(realIndex));
+
+      const btnEdit = document.createElement("button");
+      btnEdit.type = "button";
+      btnEdit.className = "btn-icon btn-small";
+      btnEdit.textContent = "Éditer";
+      btnEdit.addEventListener("click", () => onEdit(realIndex));
+
+      const btnCopy = document.createElement("button");
+      btnCopy.type = "button";
+      btnCopy.className = "btn-icon btn-small";
+      btnCopy.textContent = "Copier";
+      btnCopy.addEventListener("click", () => onDuplicate(realIndex));
+
+      const btnDelete = document.createElement("button");
+      btnDelete.type = "button";
+      btnDelete.className = "btn-icon btn-small btn-danger";
+      btnDelete.textContent = "Supprimer";
+      btnDelete.addEventListener("click", () => onDelete(realIndex));
+
+      tdActions.appendChild(btnDetails);
+      tdActions.appendChild(btnEdit);
+      tdActions.appendChild(btnCopy);
+      tdActions.appendChild(btnDelete);
+      tr.appendChild(tdActions);
+
+      tbody.appendChild(tr);
+    });
+  }
+
+  // Stats
+  function buildCountMap(values) {
+    const map = {};
+    values.forEach(v => {
+      const key = (v || "").trim();
+      if (!key) return;
+      map[key] = (map[key] || 0) + 1;
+    });
+    return map;
+  }
+
+  function renderStatsTable(tbodyEl, countMap) {
+    tbodyEl.innerHTML = "";
+    const entries = Object.entries(countMap).sort((a,b) => b[1] - a[1]);
+    if (!entries.length) {
+      const tr = document.createElement("tr");
+      const td = document.createElement("td");
+      td.colSpan = 2;
+      td.className = "no-data";
+      td.textContent = "Aucune donnée disponible.";
+      tr.appendChild(td);
+      tbodyEl.appendChild(tr);
+      return;
+    }
+    entries.forEach(([label, count]) => {
+      const tr = document.createElement("tr");
+      const tdLabel = document.createElement("td");
+      const tdCount = document.createElement("td");
+      tdLabel.textContent = label;
+      tdCount.textContent = String(count);
+      tr.appendChild(tdLabel);
+      tr.appendChild(tdCount);
+      tbodyEl.appendChild(tr);
+    });
+  }
+
+  function renderStats() {
+    // produits développés (séparés par "|")
+    const allProducts = [];
+    studies.forEach(s => {
+      if (s.products) {
+        s.products.split("|").forEach(p => {
+          const val = p.trim();
+          if (val) allProducts.push(val);
+        });
+      }
+    });
+    const prodCounts = buildCountMap(allProducts);
+    const regionCounts = buildCountMap(studies.map(s => s.region));
+    const instCounts = buildCountMap(studies.map(s => s.institution));
+    const authorCounts = buildCountMap(studies.map(s => s.author));
+
+    renderStatsTable(statsProductsTableBody, prodCounts);
+    renderStatsTable(statsRegionTableBody, regionCounts);
+    renderStatsTable(statsInstitutionTableBody, instCounts);
+    renderStatsTable(statsAuthorTableBody, authorCounts);
+  }
+
+  // Export Excel
+  function exportToExcel() {
+    if (typeof XLSX === "undefined") {
+      alert("La librairie Excel n’a pas pu être chargée.");
+      return;
+    }
+    if (!studies.length) {
+      alert("Aucune fiche à exporter.");
+      return;
+    }
+    const data = studies.map(s => ({
+      titre: s.title || "",
+      institution: s.institution || "",
+      annee: s.year || "",
+      auteur: s.author || "",
+      co_auteurs: s.coauthors || "",
+      email: s.email || "",
+      telephone: s.phone || "",
+      domaine: s.domain || "",
+      filiere: s.filiere || "",
+      produit_final: s.product_final || "",
+      type_recherche: s.type || "",
+      zone: s.region || "",
+      groupe_cible: s.target || "",
+      mots_cles: s.keywords || "",
+      resume: s.summary || "",
+      produits_developpes: s.products || "",
+      potentiel_vulgarisation: s.disseminationPotential || "",
+      commentaire_potentiel: s.disseminationNotes || "",
+      communications: s.communications || "",
+      liens: s.links || "",
+      autres_infos: s.other || ""
+    }));
+    const ws = XLSX.utils.json_to_sheet(data);
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, "Mikasa_nutrition");
+    XLSX.writeFile(wb, "mikasa_nutrition.xlsx");
+  }
+
+  // Import Excel
+  function importFromExcel(file) {
+    if (typeof XLSX === "undefined") {
+      alert("La librairie Excel n’a pas pu être chargée.");
+      return;
+    }
+    const reader = new FileReader();
+    reader.onload = function (e) {
+      const data = new Uint8Array(e.target.result);
+      const workbook = XLSX.read(data, { type: "array" });
+
+      if (!workbook.SheetNames.length) {
+        alert("Aucune feuille trouvée dans ce fichier.");
+        return;
+      }
+
+      const sheetNames = workbook.SheetNames;
+      const chosen = prompt(
+        "Nom de la feuille à importer :\n" + sheetNames.join(", "),
+        sheetNames[0]
+      );
+      if (!chosen || !sheetNames.includes(chosen)) {
+        alert("Feuille non trouvée. Import annulé.");
+        return;
+      }
+
+      const ws = workbook.Sheets[chosen];
+      const rows = XLSX.utils.sheet_to_json(ws, { defval: "" });
+      if (!rows.length) {
+        alert("La feuille sélectionnée ne contient aucune ligne lisible.");
+        return;
+      }
+
+      const mode = importModeSelect.value; // append ou overwrite
+      if (mode === "overwrite") {
+        if (!askValidationCode("écraser toutes les fiches existantes")) return;
         studies = [];
       }
-      renderTable();
-      renderCharts();
-    }
 
-    function saveToStorage() {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(studies));
-    }
-
-    // Form
-    function clearForm() {
-      form.reset();
-      editIndexInput.value = "-1";
-      submitBtn.textContent = "Enregistrer la fiche";
-      productCheckboxes.forEach(cb => cb.checked = false);
-      productsOtherInput.value = "";
-      toggleTypeOther();
-    }
-
-    function potentialLabel(value) {
-      const v = parseInt(value, 10);
-      switch (v) {
-        case 1: return "Faible";
-        case 2: return "Modéré";
-        case 3: return "Bon";
-        case 4: return "Très bon";
-        case 5: return "Excellent";
-        default: return "";
-      }
-    }
-
-    function truncate(text, max) {
-      if (!text) return "";
-      if (text.length <= max) return text;
-      return text.slice(0, max - 1) + "…";
-    }
-
-    function escapeHtml(str) {
-      if (typeof str !== "string") return "";
-      return str.replace(/[&<>"']/g, function (tag) {
-        const chars = {
-          "&": "&amp;",
-          "<": "&lt;",
-          ">": "&gt;",
-          '"': "&quot;",
-          "'": "&#039;",
+      rows.forEach(row => {
+        const study = {
+          title: row.titre || row.title || "",
+          institution: row.institution || "",
+          year: String(row.annee || row.year || "").trim(),
+          author: row.auteur || row.author || "",
+          coauthors: row.co_auteurs || row.coauthors || "",
+          email: row.email || "",
+          phone: row.telephone || row.phone || "",
+          domain: row.domaine || row.domain || "",
+          filiere: row.filiere || "",
+          product_final: row.produit_final || row.product_final || "",
+          type: row.type_recherche || row.type || "",
+          region: row.zone || row.region || "",
+          target: row.groupe_cible || row.target || "",
+          keywords: row.mots_cles || row.keywords || "",
+          summary: row.resume || row.summary || "",
+          products: row.produits_developpes || row.produits || row.products || "",
+          disseminationPotential: String(row.potentiel_vulgarisation || row.disseminationPotential || "").trim(),
+          disseminationNotes: row.commentaire_potentiel || row.disseminationNotes || "",
+          communications: row.communications || "",
+          links: row.liens || row.links || "",
+          other: row.autres_infos || row.other || ""
         };
-        return chars[tag] || tag;
-      });
-    }
-
-    function buildProductsString() {
-      const selected = Array.from(productCheckboxes)
-        .filter(cb => cb.checked)
-        .map(cb => cb.value.trim());
-      const otherVal = productsOtherInput.value.trim();
-      if (otherVal) selected.push(otherVal);
-      return selected.join(" | ");
-    }
-
-    function populateProductsFromString(text) {
-      productCheckboxes.forEach(cb => cb.checked = false);
-      productsOtherInput.value = "";
-      if (!text) return;
-      const parts = text.split("|").map(p => p.trim()).filter(Boolean);
-      const leftovers = [];
-      parts.forEach(p => {
-        const match = Array.from(productCheckboxes).find(cb => cb.value === p);
-        if (match) {
-          match.checked = true;
-        } else {
-          leftovers.push(p);
-        }
-      });
-      if (leftovers.length) {
-        productsOtherInput.value = leftovers.join(" ; ");
-      }
-    }
-
-    function populateType(studyType) {
-      const possible = Array.from(fields.type.options).map(o => o.value || o.textContent);
-      if (!studyType) {
-        fields.type.value = "";
-        typeOtherInput.value = "";
-        toggleTypeOther();
-        return;
-      }
-      if (possible.includes(studyType)) {
-        fields.type.value = studyType;
-        typeOtherInput.value = "";
-      } else {
-        fields.type.value = "Autre";
-        typeOtherInput.value = studyType;
-      }
-      toggleTypeOther();
-    }
-
-    function populateForm(study) {
-      fields.title.value = study.title || "";
-      fields.institution.value = study.institution || "";
-      fields.year.value = study.year || "";
-      fields.author.value = study.author || "";
-      fields.coauthors.value = study.coauthors || "";
-      fields.email.value = study.email || "";
-      fields.phone.value = study.phone || "";
-      fields.domain.value = study.domain || "";
-      fields.region.value = study.region || "";
-      fields.target.value = study.target || "";
-      fields.keywords.value = study.keywords || "";
-      fields.summary.value = study.summary || "";
-      fields.disseminationPotential.value = study.disseminationPotential || "";
-      fields.disseminationNotes.value = study.disseminationNotes || "";
-      fields.communications.value = study.communications || "";
-      fields.links.value = study.links || "";
-      fields.other.value = study.other || "";
-      populateType(study.type || "");
-      populateProductsFromString(study.products || "");
-    }
-
-    function onEdit(index) {
-      const study = studies[index];
-      if (!study) return;
-      populateForm(study);
-      editIndexInput.value = index;
-      submitBtn.textContent = "Mettre à jour la fiche";
-      window.scrollTo({ top: 0, behavior: "smooth" });
-      // bascule sur l’onglet Fiche
-      tabButtons.forEach(b => b.classList.remove("active"));
-      tabSections.forEach(s => s.classList.remove("active"));
-      document.querySelector('.tab-button[data-tab="form"]').classList.add("active");
-      document.getElementById("tab-form").classList.add("active");
-    }
-
-    function onDuplicate(index) {
-      const study = studies[index];
-      if (!study) return;
-      populateForm(study);
-      editIndexInput.value = "-1";
-      submitBtn.textContent = "Enregistrer la fiche";
-      window.scrollTo({ top: 0, behavior: "smooth" });
-      tabButtons.forEach(b => b.classList.remove("active"));
-      tabSections.forEach(s => s.classList.remove("active"));
-      document.querySelector('.tab-button[data-tab="form"]').classList.add("active");
-      document.getElementById("tab-form").classList.add("active");
-    }
-
-    function onDelete(index) {
-      const study = studies[index];
-      if (!study) return;
-      if (confirm("Supprimer cette fiche ?\n\n" + (study.title || "Sans titre"))) {
-        studies.splice(index, 1);
-        saveToStorage();
-        renderTable();
-        renderCharts();
-      }
-    }
-
-    // Modal détails
-    function openDetailModal(index) {
-      const study = studies[index];
-      if (!study) return;
-      detailTitle.textContent = study.title || "Détails de la fiche";
-
-      const rows = [
-        ["Institution", study.institution],
-        ["Année", study.year],
-        ["Auteur principal", study.author],
-        ["Co-auteurs", study.coauthors],
-        ["Email", study.email],
-        ["Téléphone", study.phone],
-        ["Domaine / thématique", study.domain],
-        ["Type de recherche", study.type],
-        ["Zone / région d’étude", study.region],
-        ["Population / groupe cible", study.target],
-        ["Mots-clés", study.keywords],
-        ["Résumé / grandes lignes", study.summary],
-        ["Produits développés", study.products],
-        ["Potentiel de vulgarisation", potentialLabel(study.disseminationPotential)],
-        ["Commentaire sur le potentiel", study.disseminationNotes],
-        ["Communications scientifiques", study.communications],
-        ["Liens", study.links],
-        ["Autres informations", study.other],
-      ];
-
-      detailGrid.innerHTML = "";
-      rows.forEach(([label, value]) => {
-        const labelDiv = document.createElement("div");
-        labelDiv.className = "detail-label";
-        labelDiv.textContent = label;
-
-        const valueDiv = document.createElement("div");
-        valueDiv.className = "detail-value";
-        valueDiv.innerHTML = value ? escapeHtml(value).replace(/\n/g, "<br>") : "<span class='small-text'>—</span>";
-
-        detailGrid.appendChild(labelDiv);
-        detailGrid.appendChild(valueDiv);
-      });
-
-      detailModal.classList.add("show");
-    }
-
-    function closeDetailModal() {
-      detailModal.classList.remove("show");
-    }
-
-    detailCloseBtn.addEventListener("click", closeDetailModal);
-    detailModal.addEventListener("click", (e) => {
-      if (e.target === detailModal) closeDetailModal();
-    });
-
-    // Tableau
-    function renderTable() {
-      tbody.innerHTML = "";
-      entryCountSpan.textContent = studies.length.toString();
-
-      const filter = (searchInput.value || "").toLowerCase().trim();
-
-      const filtered = studies.filter((s) => {
-        if (!filter) return true;
-        const text =
-          (s.title || "") + " " +
-          (s.institution || "") + " " +
-          (s.author || "") + " " +
-          (s.coauthors || "") + " " +
-          (s.domain || "") + " " +
-          (s.type || "") + " " +
-          (s.region || "") + " " +
-          (s.target || "") + " " +
-          (s.keywords || "") + " " +
-          (s.summary || "") + " " +
-          (s.products || "");
-        return text.toLowerCase().includes(filter);
-      });
-
-      if (filtered.length === 0) {
-        const tr = document.createElement("tr");
-        const td = document.createElement("td");
-        td.colSpan = 9;
-        td.className = "no-data";
-        td.textContent = "Aucune fiche ne correspond à ce filtre pour le moment.";
-        tr.appendChild(td);
-        tbody.appendChild(tr);
-        return;
-      }
-
-      filtered.forEach((study) => {
-        const realIndex = studies.indexOf(study);
-        const tr = document.createElement("tr");
-
-        const tdTitle = document.createElement("td");
-        tdTitle.innerHTML =
-          "<strong>" + escapeHtml(study.title || "Sans titre") + "</strong>" +
-          (study.summary
-            ? "<br/><span class='small-text'>" + escapeHtml(truncate(study.summary, 80)) + "</span>"
-            : "");
-        tr.appendChild(tdTitle);
-
-        const tdInst = document.createElement("td");
-        tdInst.textContent = study.institution || "";
-        tr.appendChild(tdInst);
-
-        const tdAuthors = document.createElement("td");
-        tdAuthors.innerHTML =
-          escapeHtml(study.author || "") +
-          (study.coauthors
-            ? "<br/><span class='small-text'>" + escapeHtml(study.coauthors) + "</span>"
-            : "");
-        tr.appendChild(tdAuthors);
-
-        const tdYear = document.createElement("td");
-        tdYear.className = "nowrap";
-        tdYear.textContent = study.year || "";
-        tr.appendChild(tdYear);
-
-        const tdType = document.createElement("td");
-        tdType.textContent = study.type || "";
-        tr.appendChild(tdType);
-
-        const tdRegionTarget = document.createElement("td");
-        tdRegionTarget.innerHTML =
-          escapeHtml(study.region || "") +
-          (study.target
-            ? "<br/><span class='small-text'>" + escapeHtml(study.target) + "</span>"
-            : "");
-        tr.appendChild(tdRegionTarget);
-
-        const tdProducts = document.createElement("td");
-        tdProducts.innerHTML = study.products
-          ? "<span class='small-text'>" + escapeHtml(truncate(study.products, 80)) + "</span>"
-          : "";
-        tr.appendChild(tdProducts);
-
-        const tdPotential = document.createElement("td");
-        if (study.disseminationPotential) {
-          tdPotential.innerHTML =
-            "<span class='pill'>" + escapeHtml(potentialLabel(study.disseminationPotential)) + "</span>";
-        }
-        tr.appendChild(tdPotential);
-
-        const tdActions = document.createElement("td");
-        tdActions.className = "col-actions";
-
-        const btnDetails = document.createElement("button");
-        btnDetails.type = "button";
-        btnDetails.className = "btn-icon btn-small";
-        btnDetails.textContent = "Détails";
-        btnDetails.addEventListener("click", () => openDetailModal(realIndex));
-
-        const btnEdit = document.createElement("button");
-        btnEdit.type = "button";
-        btnEdit.className = "btn-icon btn-small";
-        btnEdit.textContent = "Éditer";
-        btnEdit.addEventListener("click", () => onEdit(realIndex));
-
-        const btnCopy = document.createElement("button");
-        btnCopy.type = "button";
-        btnCopy.className = "btn-icon btn-small";
-        btnCopy.textContent = "Copier";
-        btnCopy.addEventListener("click", () => onDuplicate(realIndex));
-
-        const btnDelete = document.createElement("button");
-        btnDelete.type = "button";
-        btnDelete.className = "btn-icon btn-small btn-danger";
-        btnDelete.textContent = "Supprimer";
-        btnDelete.addEventListener("click", () => onDelete(realIndex));
-
-        tdActions.appendChild(btnDetails);
-        tdActions.appendChild(btnEdit);
-        tdActions.appendChild(btnCopy);
-        tdActions.appendChild(btnDelete);
-        tr.appendChild(tdActions);
-
-        tbody.appendChild(tr);
-      });
-    }
-
-    // Graphiques
-    function buildCountMap(values) {
-      const map = {};
-      values.forEach(v => {
-        const key = (v || "").trim();
-        if (!key) return;
-        map[key] = (map[key] || 0) + 1;
-      });
-      return map;
-    }
-
-    function renderCharts() {
-      if (typeof Chart === "undefined") return;
-
-      // produits (chaque valeur séparée par "|")
-      const allProducts = [];
-      studies.forEach(s => {
-        if (s.products) {
-          s.products.split("|").forEach(p => {
-            const val = p.trim();
-            if (val) allProducts.push(val);
-          });
-        }
-      });
-      const prodCounts = buildCountMap(allProducts);
-
-      const regionCounts = buildCountMap(studies.map(s => s.region));
-      const instCounts = buildCountMap(studies.map(s => s.institution));
-      const authorCounts = buildCountMap(studies.map(s => s.author));
-
-      function createOrUpdateChart(oldChart, ctxId, labels, data, label) {
-        const ctx = document.getElementById(ctxId);
-        if (!ctx) return null;
-        if (oldChart) oldChart.destroy();
-        if (!labels.length) return null;
-        return new Chart(ctx, {
-          type: "bar",
-          data: {
-            labels,
-            datasets: [{
-              label,
-              data
-            }]
-          },
-          options: {
-            responsive: true,
-            plugins: {
-              legend: { display: false }
-            },
-            scales: {
-              x: { ticks: { autoSkip: true, maxRotation: 60, minRotation: 0 } },
-              y: { beginAtZero: true, precision: 0 }
-            }
-          }
-        });
-      }
-
-      chartProducts = createOrUpdateChart(
-        chartProducts,
-        "chart-products",
-        Object.keys(prodCounts),
-        Object.values(prodCounts),
-        "Nombre de recherches"
-      );
-      chartRegion = createOrUpdateChart(
-        chartRegion,
-        "chart-region",
-        Object.keys(regionCounts),
-        Object.values(regionCounts),
-        "Nombre de recherches"
-      );
-      chartInstitution = createOrUpdateChart(
-        chartInstitution,
-        "chart-institution",
-        Object.keys(instCounts),
-        Object.values(instCounts),
-        "Nombre de recherches"
-      );
-      chartAuthor = createOrUpdateChart(
-        chartAuthor,
-        "chart-author",
-        Object.keys(authorCounts),
-        Object.values(authorCounts),
-        "Nombre de recherches"
-      );
-    }
-
-    // Export Excel
-    function exportToExcel() {
-      if (typeof XLSX === "undefined") {
-        alert("La librairie Excel n’a pas pu être chargée.");
-        return;
-      }
-      if (!studies.length) {
-        alert("Aucune fiche à exporter.");
-        return;
-      }
-      const data = studies.map(s => ({
-        titre: s.title || "",
-        institution: s.institution || "",
-        annee: s.year || "",
-        auteur: s.author || "",
-        co_auteurs: s.coauthors || "",
-        email: s.email || "",
-        telephone: s.phone || "",
-        domaine: s.domain || "",
-        type_recherche: s.type || "",
-        zone: s.region || "",
-        groupe_cible: s.target || "",
-        mots_cles: s.keywords || "",
-        resume: s.summary || "",
-        produits: s.products || "",
-        potentiel_vulgarisation: s.disseminationPotential || "",
-        commentaire_potentiel: s.disseminationNotes || "",
-        communications: s.communications || "",
-        liens: s.links || "",
-        autres_infos: s.other || ""
-      }));
-      const ws = XLSX.utils.json_to_sheet(data);
-      const wb = XLSX.utils.book_new();
-      XLSX.utils.book_append_sheet(wb, ws, "Mikasa_nutrition");
-      XLSX.writeFile(wb, "mikasa_nutrition.xlsx");
-    }
-
-    // Import Excel
-    function importFromExcel(file) {
-      if (typeof XLSX === "undefined") {
-        alert("La librairie Excel n’a pas pu être chargée.");
-        return;
-      }
-      const reader = new FileReader();
-      reader.onload = function (e) {
-        const data = new Uint8Array(e.target.result);
-        const workbook = XLSX.read(data, { type: "array" });
-
-        if (!workbook.SheetNames.length) {
-          alert("Aucune feuille trouvée dans ce fichier.");
-          return;
-        }
-
-        const sheetNames = workbook.SheetNames;
-        const chosen = prompt(
-          "Nom de la feuille à importer :\n" + sheetNames.join(", "),
-          sheetNames[0]
-        );
-        if (!chosen || !sheetNames.includes(chosen)) {
-          alert("Feuille non trouvée. Import annulé.");
-          return;
-        }
-
-        const ws = workbook.Sheets[chosen];
-        const rows = XLSX.utils.sheet_to_json(ws, { defval: "" });
-        if (!rows.length) {
-          alert("La feuille sélectionnée ne contient aucune ligne lisible.");
-          return;
-        }
-
-        // On s'attend à des entêtes proches de ceux utilisés à l’export
-        rows.forEach(row => {
-          const study = {
-            title: row.titre || row.title || "",
-            institution: row.institution || "",
-            year: String(row.annee || row.year || "").trim(),
-            author: row.auteur || row.author || "",
-            coauthors: row.co_auteurs || row.coauthors || "",
-            email: row.email || "",
-            phone: row.telephone || row.phone || "",
-            domain: row.domaine || row.domain || "",
-            type: row.type_recherche || row.type || "",
-            region: row.zone || row.region || "",
-            target: row.groupe_cible || row.target || "",
-            keywords: row.mots_cles || row.keywords || "",
-            summary: row.resume || row.summary || "",
-            products: row.produits || row.products || "",
-            disseminationPotential: String(row.potentiel_vulgarisation || row.disseminationPotential || "").trim(),
-            disseminationNotes: row.commentaire_potentiel || row.disseminationNotes || "",
-            communications: row.communications || "",
-            links: row.liens || row.links || "",
-            other: row.autres_infos || row.other || ""
-          };
-          studies.push(study);
-        });
-
-        saveToStorage();
-        renderTable();
-        renderCharts();
-        alert(rows.length + " fiche(s) importée(s).");
-      };
-      reader.readAsArrayBuffer(file);
-    }
-
-    // Écouteurs
-    form.addEventListener("submit", function (e) {
-      e.preventDefault();
-
-      if (!fields.title.value.trim()) {
-        alert("Merci de renseigner au moins le titre de la recherche.");
-        return;
-      }
-
-      let typeValue = fields.type.value;
-      if (typeValue === "Autre") {
-        typeValue = typeOtherInput.value.trim() || "Autre (non précisé)";
-      }
-      fields.type.value = typeValue;
-
-      fields.products.value = buildProductsString();
-
-      const study = {};
-      for (const key in fields) {
-        study[key] = fields[key].value.trim();
-      }
-
-      const editIndex = parseInt(editIndexInput.value, 10);
-      if (editIndex >= 0 && editIndex < studies.length) {
-        studies[editIndex] = { ...studies[editIndex], ...study };
-      } else {
         studies.push(study);
-      }
+      });
 
       saveToStorage();
       renderTable();
-      renderCharts();
-      clearForm();
-    });
+      renderStats();
+      alert(rows.length + " fiche(s) importée(s).");
+    };
+    reader.readAsArrayBuffer(file);
+  }
 
-    searchInput.addEventListener("input", () => {
-      renderTable();
-    });
-    resetBtn.addEventListener("click", clearForm);
+  // Détection et suppression de doublons
+  function removeDuplicates() {
+    if (!studies.length) {
+      alert("Aucune fiche à dédoublonner.");
+      return;
+    }
+    if (!askValidationCode("supprimer les doublons")) return;
 
-    exportExcelBtn.addEventListener("click", exportToExcel);
-    importExcelInput.addEventListener("change", (e) => {
-      const file = e.target.files[0];
-      if (file) {
-        importFromExcel(file);
-        importExcelInput.value = "";
+    const seen = {};
+    const unique = [];
+    let removed = 0;
+
+    studies.forEach(study => {
+      const key =
+        (study.title || "").trim().toLowerCase() + "|" +
+        (study.institution || "").trim().toLowerCase() + "|" +
+        (study.year || "").trim();
+      if (seen[key]) {
+        removed += 1;
+      } else {
+        seen[key] = true;
+        unique.push(study);
       }
     });
 
-    // Init
-    loadFromStorage();
-  })();
+    studies = unique;
+    saveToStorage();
+    renderTable();
+    renderStats();
+    alert(removed + " doublon(s) supprimé(s).");
+  }
+
+  // Suppression multiple
+  function deleteSelected() {
+    const checkboxes = Array.from(document.querySelectorAll(".row-select:checked"));
+    if (!checkboxes.length) {
+      alert("Aucune fiche sélectionnée.");
+      return;
+    }
+    if (!askValidationCode("supprimer les fiches sélectionnées")) return;
+
+    const indexes = checkboxes.map(cb => parseInt(cb.dataset.index, 10))
+      .filter(i => !isNaN(i));
+    const uniqueIdx = Array.from(new Set(indexes)).sort((a,b) => b - a);
+
+    if (!uniqueIdx.length) {
+      alert("Aucune fiche valide à supprimer.");
+      return;
+    }
+
+    if (!confirm("Supprimer " + uniqueIdx.length + " fiche(s) sélectionnée(s) ?")) return;
+
+    uniqueIdx.forEach(i => {
+      if (i >= 0 && i < studies.length) {
+        studies.splice(i, 1);
+      }
+    });
+
+    saveToStorage();
+    renderTable();
+    renderStats();
+  }
+
+  // Écouteurs
+  form.addEventListener("submit", function (e) {
+    e.preventDefault();
+
+    if (!fields.title.value.trim()) {
+      alert("Merci de renseigner au moins le titre de la recherche.");
+      return;
+    }
+
+    let editIndex = parseInt(editIndexInput.value, 10);
+    if (editIndex >= 0 && editIndex < studies.length) {
+      if (!askValidationCode("mettre à jour cette fiche")) return;
+    }
+
+    let typeValue = fields.type.value;
+    if (typeValue === "Autre") {
+      typeValue = typeOtherInput.value.trim() || "Autre (non précisé)";
+    }
+    fields.type.value = typeValue;
+
+    fields.products.value = buildProductsString();
+
+    const study = {};
+    for (const key in fields) {
+      study[key] = fields[key].value.trim();
+    }
+
+    if (editIndex >= 0 && editIndex < studies.length) {
+      studies[editIndex] = { ...studies[editIndex], ...study };
+    } else {
+      studies.push(study);
+    }
+
+    saveToStorage();
+    renderTable();
+    renderStats();
+    clearForm();
+  });
+
+  searchInput.addEventListener("input", () => {
+    renderTable();
+  });
+  resetBtn.addEventListener("click", clearForm);
+
+  exportExcelBtn.addEventListener("click", exportToExcel);
+  importExcelInput.addEventListener("change", (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      importFromExcel(file);
+      importExcelInput.value = "";
+    }
+  });
+
+  bulkDeleteBtn.addEventListener("click", deleteSelected);
+  dedupeBtn.addEventListener("click", removeDuplicates);
+
+  selectAllCheckbox.addEventListener("change", () => {
+    const checked = selectAllCheckbox.checked;
+    const cbs = document.querySelectorAll(".row-select");
+    cbs.forEach(cb => {
+      cb.checked = checked;
+    });
+  });
+
+  // Init
+  loadFromStorage();
+})();
 </script>
 
 </body>
