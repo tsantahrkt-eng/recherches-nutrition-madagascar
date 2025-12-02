@@ -858,4 +858,1108 @@
 
       <div class="actions-row" style="margin-top:4px; justify-content:flex-start; align-items:center;">
         <button type="button" class="btn-primary btn-small" id="export-excel-btn">
-          ⬇
+          ⬇ Exporter Excel
+        </button>
+        <label class="btn-secondary btn-small" style="cursor:pointer;">
+          ⬆ Importer Excel
+          <input type="file" id="import-excel-input" accept=".xlsx,.xls" style="display:none;" />
+        </label>
+        <select id="import-mode" style="margin-left:6px; padding:4px 8px; font-size:0.8rem;">
+          <option value="append">Mode import : ajouter</option>
+          <option value="overwrite">Mode import : écraser</option>
+        </select>
+      </div>
+
+      <div class="actions-row" style="margin-top:4px; justify-content:flex-start;">
+        <button type="button" class="btn-secondary btn-small" id="bulk-delete-btn">
+          🗑️ Supprimer la sélection
+        </button>
+        <button type="button" class="btn-secondary btn-small" id="dedupe-btn">
+          ♻️ Supprimer les doublons
+        </button>
+      </div>
+
+      <div style="overflow-x: auto; max-height: 420px; margin-top: 6px;">
+        <table>
+          <thead>
+          <tr>
+            <th><input type="checkbox" id="select-all" /></th>
+            <th>Titre</th>
+            <th>Institution</th>
+            <th>Auteur(s)</th>
+            <th>Année</th>
+            <th>Filière</th>
+            <th>Produit final</th>
+            <th>Région d’étude / groupe cible</th>
+            <th class="col-actions">Actions</th>
+          </tr>
+          </thead>
+          <tbody id="studies-tbody"></tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <!-- ONGLET PRODUITS -->
+  <section id="tab-products" class="tab-section">
+    <div class="card">
+      <div class="card-header">
+        <div class="card-title">
+          <span class="dot"></span>
+          <span>Produits et filières issus des recherches</span>
+        </div>
+      </div>
+      <p class="hint" style="margin-bottom:8px;">
+        Synthèse des produits finaux, regroupés par filière et associés aux régions d’étude. Le texte reprend les éléments des fiches (résumé, autres infos).
+      </p>
+      <div style="overflow-x:auto; max-height: 420px; margin-top: 6px;">
+        <table>
+          <thead>
+          <tr>
+            <th>Filière</th>
+            <th>Produit final</th>
+            <th>Régions d’étude</th>
+            <th>Processus / remarques issues des fiches</th>
+          </tr>
+          </thead>
+          <tbody id="products-tbody"></tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <!-- ONGLET STATISTIQUES -->
+  <section id="tab-stats" class="tab-section">
+    <div class="card">
+      <div class="card-header">
+        <div class="card-title">
+          <span class="dot"></span>
+          <span>Statistiques synthétiques</span>
+        </div>
+      </div>
+      <p class="hint" style="margin-bottom:10px;">
+        Les graphiques et tableaux se mettent à jour automatiquement en fonction des fiches enregistrées.
+      </p>
+
+      <div class="stats-block">
+        <div class="stats-title">
+          <span class="dot"></span>
+          <span>Répartition par région d’étude</span>
+        </div>
+        <div class="stats-meta">
+          <span class="stats-badge">Graphique horizontal</span>
+          <span>Basé sur la région d’étude (et non la région du chercheur).</span>
+        </div>
+        <div id="stats-region-chart" class="chart-block"></div>
+      </div>
+
+      <div class="stats-block">
+        <div class="stats-title">
+          <span class="dot"></span>
+          <span>Répartition par filière</span>
+        </div>
+        <div class="stats-meta">
+          <span class="stats-badge">Regroupement simplifié</span>
+          <span>Regroupement par premier mot (par ex. “Banane esp. Musa” → “Banane”).</span>
+        </div>
+        <div id="stats-filiere-chart" class="chart-block"></div>
+      </div>
+
+      <div class="stats-block">
+        <div class="stats-title">
+          <span class="dot"></span>
+          <span>Répartition par institution</span>
+        </div>
+        <table id="stats-institution-table">
+          <thead>
+          <tr><th>Institution</th><th>Nombre de recherches</th></tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+</div>
+
+<!-- MODAL DÉTAILS -->
+<div id="detail-modal" class="modal-backdrop">
+  <div class="modal-content">
+    <div class="modal-header">
+      <div class="modal-title">
+        <span class="icon">🔍</span>
+        <span id="detail-title">Détails de la fiche</span>
+      </div>
+      <button class="modal-close" id="detail-close-btn">
+        <span class="icon">✖</span>
+        <span>Fermer</span>
+      </button>
+    </div>
+    <div class="modal-body">
+      <div class="detail-grid" id="detail-grid">
+        <!-- rempli en JavaScript -->
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Liste de régions pour autocomplétion -->
+<datalist id="regions-list">
+  <option value="Analamanga"></option>
+  <option value="Vakinankaratra"></option>
+  <option value="Itasy"></option>
+  <option value="Bongolava"></option>
+  <option value="Alaotra-Mangoro"></option>
+  <option value="Atsinanana"></option>
+  <option value="Analanjirofo"></option>
+  <option value="Atsimo-Atsinanana"></option>
+  <option value="Vatovavy"></option>
+  <option value="Fitovinany"></option>
+  <option value="Menabe"></option>
+  <option value="Atsimo-Andrefana"></option>
+  <option value="Androy"></option>
+  <option value="Anosy"></option>
+  <option value="Ihorombe"></option>
+  <option value="Haute Matsiatra"></option>
+  <option value="Amoron'i Mania"></option>
+  <option value="Betsiboka"></option>
+  <option value="Boeny"></option>
+  <option value="Sofia"></option>
+  <option value="Melaky"></option>
+  <option value="DIANA"></option>
+  <option value="SAVA"></option>
+  <option value="National"></option>
+  <option value="Multi-régions"></option>
+</datalist>
+
+<!-- Librairie Excel -->
+<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+
+<script>
+(function () {
+  const STORAGE_KEY = "nutritionStudiesMG";
+
+  let studies = [];
+
+  // éléments principaux
+  const form = document.getElementById("study-form");
+  const editIndexInput = document.getElementById("edit-index");
+  const entryCountSpan = document.getElementById("entry-count");
+  const searchInput = document.getElementById("search-input");
+  const tbody = document.getElementById("studies-tbody");
+  const productsTbody = document.getElementById("products-tbody");
+  const resetBtn = document.getElementById("reset-btn");
+  const submitBtn = document.getElementById("submit-btn");
+
+  const exportExcelBtn = document.getElementById("export-excel-btn");
+  const importExcelInput = document.getElementById("import-excel-input");
+  const importModeSelect = document.getElementById("import-mode");
+  const bulkDeleteBtn = document.getElementById("bulk-delete-btn");
+  const dedupeBtn = document.getElementById("dedupe-btn");
+  const selectAllCheckbox = document.getElementById("select-all");
+
+  const fields = {
+    title: document.getElementById("title"),
+    institution: document.getElementById("institution"),
+    year: document.getElementById("year"),
+    author: document.getElementById("author"),
+    coauthors: document.getElementById("coauthors"),
+    email: document.getElementById("email"),
+    phone: document.getElementById("phone"),
+    domain: document.getElementById("domain"),
+    filiere: document.getElementById("filiere"),
+    product_final: document.getElementById("product_final"),
+    regionStudy: document.getElementById("region-study"),
+    zoneStudy: document.getElementById("zone-study"),
+    regionResearcher: document.getElementById("region-researcher"),
+    target: document.getElementById("target"),
+    keywords: document.getElementById("keywords"),
+    summary: document.getElementById("summary"),
+    products: document.getElementById("products"),
+    disseminationPotential: document.getElementById("dissemination-potential"),
+    disseminationNotes: document.getElementById("dissemination-notes"),
+    communications: document.getElementById("communications"),
+    links: document.getElementById("links"),
+    other: document.getElementById("other"),
+  };
+
+  const productCheckboxes = document.querySelectorAll(".product-checkbox");
+  const productsOtherInput = document.getElementById("products-other");
+
+  // Modal détails
+  const detailModal = document.getElementById("detail-modal");
+  const detailGrid = document.getElementById("detail-grid");
+  const detailTitle = document.getElementById("detail-title");
+  const detailCloseBtn = document.getElementById("detail-close-btn");
+
+  // Onglets
+  const tabButtons = document.querySelectorAll(".tab-button");
+  const tabSections = document.querySelectorAll(".tab-section");
+
+  // Stats containers
+  const statsRegionChart = document.getElementById("stats-region-chart");
+  const statsFiliereChart = document.getElementById("stats-filiere-chart");
+  const statsInstitutionTableBody = document.querySelector("#stats-institution-table tbody");
+
+  // Gestion des onglets
+  tabButtons.forEach(btn => {
+    btn.addEventListener("click", () => {
+      const tab = btn.getAttribute("data-tab");
+      tabButtons.forEach(b => b.classList.remove("active"));
+      tabSections.forEach(s => s.classList.remove("active"));
+      btn.classList.add("active");
+      const section = document.getElementById("tab-" + tab);
+      if (section) section.classList.add("active");
+    });
+  });
+
+  // LocalStorage
+  function loadFromStorage() {
+    try {
+      const raw = localStorage.getItem(STORAGE_KEY);
+      studies = raw ? JSON.parse(raw) : [];
+    } catch (e) {
+      studies = [];
+    }
+
+    // Compat ascendante avec ancien schéma
+    studies = studies.map(s => {
+      const copy = { ...s };
+
+      if (!copy.regionStudy && copy.region) {
+        copy.regionStudy = copy.region;
+      }
+
+      if (!copy.domain && copy.domaine) {
+        copy.domain = copy.domaine;
+      }
+      if (copy.type) {
+        if (copy.domain && !copy.domain.includes(copy.type)) {
+          copy.domain = copy.domain + " | " + copy.type;
+        } else if (!copy.domain) {
+          copy.domain = copy.type;
+        }
+      }
+
+      return copy;
+    });
+
+    renderTable();
+    renderStats();
+    renderProductsTable();
+  }
+
+  function saveToStorage() {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(studies));
+  }
+
+  // Form
+  function clearForm() {
+    form.reset();
+    editIndexInput.value = "-1";
+    submitBtn.textContent = "💾 Enregistrer la fiche";
+    productCheckboxes.forEach(cb => cb.checked = false);
+    productsOtherInput.value = "";
+  }
+
+  function potentialLabel(value) {
+    const v = parseInt(value, 10);
+    switch (v) {
+      case 1: return "Faible";
+      case 2: return "Modéré";
+      case 3: return "Bon";
+      case 4: return "Très bon";
+      case 5: return "Excellent";
+      default: return "";
+    }
+  }
+
+  function truncate(text, max) {
+    if (!text) return "";
+    if (text.length <= max) return text;
+    return text.slice(0, max - 1) + "…";
+  }
+
+  function escapeHtml(str) {
+    if (typeof str !== "string") return "";
+    return str.replace(/[&<>"']/g, function (tag) {
+      const chars = {
+        "&": "&amp;",
+        "<": "&lt;",
+        ">": "&gt;",
+        '"': "&quot;",
+        "'": "&#039;",
+      };
+      return chars[tag] || tag;
+    });
+  }
+
+  function buildProductsString() {
+    const selected = Array.from(productCheckboxes)
+      .filter(cb => cb.checked)
+      .map(cb => cb.value.trim());
+    const otherVal = productsOtherInput.value.trim();
+    if (otherVal) selected.push(otherVal);
+    return selected.join(" | ");
+  }
+
+  function populateProductsFromString(text) {
+    productCheckboxes.forEach(cb => cb.checked = false);
+    productsOtherInput.value = "";
+    if (!text) return;
+    const parts = text.split("|").map(p => p.trim()).filter(Boolean);
+    const leftovers = [];
+    parts.forEach(p => {
+      const match = Array.from(productCheckboxes).find(cb => cb.value === p);
+      if (match) {
+        match.checked = true;
+      } else {
+        leftovers.push(p);
+      }
+    });
+    if (leftovers.length) {
+      productsOtherInput.value = leftovers.join(" ; ");
+    }
+  }
+
+  function populateForm(study) {
+    fields.title.value = study.title || "";
+    fields.institution.value = study.institution || "";
+    fields.year.value = study.year || "";
+    fields.author.value = study.author || "";
+    fields.coauthors.value = study.coauthors || "";
+    fields.email.value = study.email || "";
+    fields.phone.value = study.phone || "";
+    fields.domain.value = study.domain || "";
+    fields.filiere.value = study.filiere || "";
+    fields.product_final.value = study.product_final || "";
+    fields.regionStudy.value = study.regionStudy || study.region || "";
+    fields.zoneStudy.value = study.zoneStudy || "";
+    fields.regionResearcher.value = study.regionResearcher || "";
+    fields.target.value = study.target || "";
+    fields.keywords.value = study.keywords || "";
+    fields.summary.value = study.summary || "";
+    fields.disseminationPotential.value = study.disseminationPotential || "";
+    fields.disseminationNotes.value = study.disseminationNotes || "";
+    fields.communications.value = study.communications || "";
+    fields.links.value = study.links || "";
+    fields.other.value = study.other || "";
+    populateProductsFromString(study.products || "");
+  }
+
+  function askValidationCode(actionLabel) {
+    const code = prompt("Code de validation requis pour " + actionLabel + " :");
+    if (code === null) return false;
+    if (code.trim() !== "t1406") {
+      alert("Code incorrect. Action annulée.");
+      return false;
+    }
+    return true;
+  }
+
+  function onEdit(index) {
+    const study = studies[index];
+    if (!study) return;
+    if (!askValidationCode("modifier cette fiche")) return;
+    populateForm(study);
+    editIndexInput.value = index;
+    submitBtn.textContent = "✏️ Mettre à jour la fiche";
+    window.scrollTo({ top: 0, behavior: "smooth" });
+    tabButtons.forEach(b => b.classList.remove("active"));
+    tabSections.forEach(s => s.classList.remove("active"));
+    const btnForm = document.querySelector('.tab-button[data-tab="form"]');
+    const secForm = document.getElementById("tab-form");
+    if (btnForm) btnForm.classList.add("active");
+    if (secForm) secForm.classList.add("active");
+  }
+
+  function onDuplicate(index) {
+    const study = studies[index];
+    if (!study) return;
+    populateForm(study);
+    editIndexInput.value = "-1";
+    submitBtn.textContent = "💾 Enregistrer la fiche";
+    window.scrollTo({ top: 0, behavior: "smooth" });
+    tabButtons.forEach(b => b.classList.remove("active"));
+    tabSections.forEach(s => s.classList.remove("active"));
+    const btnForm = document.querySelector('.tab-button[data-tab="form"]');
+    const secForm = document.getElementById("tab-form");
+    if (btnForm) btnForm.classList.add("active");
+    if (secForm) secForm.classList.add("active");
+  }
+
+  function onDelete(index) {
+    const study = studies[index];
+    if (!study) return;
+    if (!askValidationCode("supprimer cette fiche")) return;
+    if (confirm("Supprimer cette fiche ?\n\n" + (study.title || "Sans titre"))) {
+      studies.splice(index, 1);
+      saveToStorage();
+      renderTable();
+      renderStats();
+      renderProductsTable();
+    }
+  }
+
+  // Modal détails
+  function openDetailModal(index) {
+    const study = studies[index];
+    if (!study) return;
+    detailTitle.textContent = study.title || "Détails de la fiche";
+
+    const rows = [
+      ["Institution", study.institution],
+      ["Année", study.year],
+      ["Auteur principal", study.author],
+      ["Co-auteurs", study.coauthors],
+      ["Email", study.email],
+      ["Téléphone", study.phone],
+      ["Catégorie scientifique (domaine & type)", study.domain],
+      ["Filière", study.filiere],
+      ["Produit final étudié", study.product_final],
+      ["Région d’étude", study.regionStudy || study.region],
+      ["Zone d’étude", study.zoneStudy],
+      ["Région du chercheur / équipe", study.regionResearcher],
+      ["Population / groupe cible", study.target],
+      ["Mots-clés", study.keywords],
+      ["Résumé / grandes lignes", study.summary],
+      ["Sorties / productions", study.products],
+      ["Potentiel de vulgarisation", potentialLabel(study.disseminationPotential)],
+      ["Commentaire sur le potentiel", study.disseminationNotes],
+      ["Communications scientifiques", study.communications],
+      ["Liens", study.links],
+      ["Autres informations", study.other],
+    ];
+
+    detailGrid.innerHTML = "";
+    rows.forEach(([label, value]) => {
+      const labelDiv = document.createElement("div");
+      labelDiv.className = "detail-label";
+      labelDiv.textContent = label;
+
+      const valueDiv = document.createElement("div");
+      valueDiv.className = "detail-value";
+      valueDiv.innerHTML = value ? escapeHtml(value).replace(/\n/g, "<br>") : "<span class='small-text'>—</span>";
+
+      detailGrid.appendChild(labelDiv);
+      detailGrid.appendChild(valueDiv);
+    });
+
+    detailModal.classList.add("show");
+  }
+
+  function closeDetailModal() {
+    detailModal.classList.remove("show");
+  }
+
+  if (detailCloseBtn && detailModal) {
+    detailCloseBtn.addEventListener("click", closeDetailModal);
+    detailModal.addEventListener("click", (e) => {
+      if (e.target === detailModal) closeDetailModal();
+    });
+  }
+
+  // Tableau principal
+  function renderTable() {
+    if (!tbody) return;
+    tbody.innerHTML = "";
+    if (entryCountSpan) entryCountSpan.textContent = studies.length.toString();
+    if (selectAllCheckbox) selectAllCheckbox.checked = false;
+
+    const filter = (searchInput && searchInput.value || "").toLowerCase().trim();
+
+    const filtered = studies.filter((s) => {
+      if (!filter) return true;
+      const text =
+        (s.title || "") + " " +
+        (s.institution || "") + " " +
+        (s.author || "") + " " +
+        (s.coauthors || "") + " " +
+        (s.domain || "") + " " +
+        (s.filiere || "") + " " +
+        (s.product_final || "") + " " +
+        (s.regionStudy || s.region || "") + " " +
+        (s.zoneStudy || "") + " " +
+        (s.regionResearcher || "") + " " +
+        (s.target || "") + " " +
+        (s.keywords || "") + " " +
+        (s.summary || "") + " " +
+        (s.products || "");
+      return text.toLowerCase().includes(filter);
+    });
+
+    if (filtered.length === 0) {
+      const tr = document.createElement("tr");
+      const td = document.createElement("td");
+      td.colSpan = 9;
+      td.className = "no-data";
+      td.textContent = "Aucune fiche ne correspond à ce filtre pour le moment.";
+      tr.appendChild(td);
+      tbody.appendChild(tr);
+      return;
+    }
+
+    filtered.forEach((study) => {
+      const realIndex = studies.indexOf(study);
+      const tr = document.createElement("tr");
+
+      const tdSelect = document.createElement("td");
+      const cb = document.createElement("input");
+      cb.type = "checkbox";
+      cb.className = "row-select";
+      cb.dataset.index = String(realIndex);
+      tdSelect.appendChild(cb);
+      tr.appendChild(tdSelect);
+
+      const tdTitle = document.createElement("td");
+      tdTitle.innerHTML =
+        "<strong>" + escapeHtml(study.title || "Sans titre") + "</strong>" +
+        (study.summary
+          ? "<br/><span class='small-text'>" + escapeHtml(truncate(study.summary, 80)) + "</span>"
+          : "");
+      tr.appendChild(tdTitle);
+
+      const tdInst = document.createElement("td");
+      tdInst.textContent = study.institution || "";
+      tr.appendChild(tdInst);
+
+      const tdAuthors = document.createElement("td");
+      tdAuthors.innerHTML =
+        escapeHtml(study.author || "") +
+        (study.coauthors
+          ? "<br/><span class='small-text'>" + escapeHtml(study.coauthors) + "</span>"
+          : "");
+      tr.appendChild(tdAuthors);
+
+      const tdYear = document.createElement("td");
+      tdYear.className = "nowrap";
+      tdYear.textContent = study.year || "";
+      tr.appendChild(tdYear);
+
+      const tdFiliere = document.createElement("td");
+      tdFiliere.textContent = study.filiere || "";
+      tr.appendChild(tdFiliere);
+
+      const tdProdFinal = document.createElement("td");
+      tdProdFinal.textContent = study.product_final || "";
+      tr.appendChild(tdProdFinal);
+
+      const tdRegionStudy = document.createElement("td");
+      tdRegionStudy.innerHTML =
+        escapeHtml(study.regionStudy || study.region || "") +
+        (study.target
+          ? "<br/><span class='small-text'>" + escapeHtml(study.target) + "</span>"
+          : "");
+      tr.appendChild(tdRegionStudy);
+
+      const tdActions = document.createElement("td");
+      tdActions.className = "col-actions";
+
+      const btnDetails = document.createElement("button");
+      btnDetails.type = "button";
+      btnDetails.className = "btn-chip btn-chip-info";
+      btnDetails.innerHTML = '<span class="icon">🔍</span><span>Détails</span>';
+      btnDetails.addEventListener("click", () => openDetailModal(realIndex));
+
+      const btnEdit = document.createElement("button");
+      btnEdit.type = "button";
+      btnEdit.className = "btn-chip btn-chip-edit";
+      btnEdit.innerHTML = '<span class="icon">✏️</span><span>Éditer</span>';
+      btnEdit.addEventListener("click", () => onEdit(realIndex));
+
+      const btnCopy = document.createElement("button");
+      btnCopy.type = "button";
+      btnCopy.className = "btn-chip btn-chip-neutral";
+      btnCopy.innerHTML = '<span class="icon">📄</span><span>Dupliquer</span>';
+      btnCopy.addEventListener("click", () => onDuplicate(realIndex));
+
+      const btnDelete = document.createElement("button");
+      btnDelete.type = "button";
+      btnDelete.className = "btn-chip btn-chip-danger";
+      btnDelete.innerHTML = '<span class="icon">🗑️</span><span>Supprimer</span>';
+      btnDelete.addEventListener("click", () => onDelete(realIndex));
+
+      tdActions.appendChild(btnDetails);
+      tdActions.appendChild(btnEdit);
+      tdActions.appendChild(btnCopy);
+      tdActions.appendChild(btnDelete);
+      tr.appendChild(tdActions);
+
+      tbody.appendChild(tr);
+    });
+  }
+
+  // Produits : synthèse par filière & produit final
+  function renderProductsTable() {
+    if (!productsTbody) return;
+    productsTbody.innerHTML = "";
+
+    const map = {};
+    studies.forEach(s => {
+      const fil = (s.filiere || "").trim();
+      const prod = (s.product_final || "").trim();
+      if (!fil && !prod) return;
+      const key = fil.toLowerCase() + "|" + prod.toLowerCase();
+      if (!map[key]) {
+        map[key] = {
+          filiere: fil,
+          product_final: prod,
+          regions: new Set(),
+          processes: []
+        };
+      }
+      const regionLabel = (s.regionStudy || s.region || "").trim();
+      if (regionLabel) {
+        map[key].regions.add(regionLabel);
+      }
+
+      const procParts = [];
+      if (s.other) procParts.push(s.other);
+      if (s.summary) procParts.push(s.summary);
+      const processText = procParts.join("\n\n").trim();
+      if (processText) {
+        map[key].processes.push(processText);
+      }
+    });
+
+    const entries = Object.values(map);
+    if (!entries.length) {
+      const tr = document.createElement("tr");
+      const td = document.createElement("td");
+      td.colSpan = 4;
+      td.className = "no-data";
+      td.textContent = "Aucun produit n’est disponible dans les fiches pour le moment.";
+      tr.appendChild(td);
+      productsTbody.appendChild(tr);
+      return;
+    }
+
+    entries.sort((a, b) => {
+      const fa = (a.filiere || "").toLowerCase();
+      const fb = (b.filiere || "").toLowerCase();
+      if (fa < fb) return -1;
+      if (fa > fb) return 1;
+      const pa = (a.product_final || "").toLowerCase();
+      const pb = (b.product_final || "").toLowerCase();
+      if (pa < pb) return -1;
+      if (pa > pb) return 1;
+      return 0;
+    });
+
+    entries.forEach(entry => {
+      const tr = document.createElement("tr");
+
+      const tdFil = document.createElement("td");
+      tdFil.textContent = entry.filiere || "";
+      const tdProd = document.createElement("td");
+      tdProd.textContent = entry.product_final || "";
+
+      const tdReg = document.createElement("td");
+      const regionsArr = Array.from(entry.regions);
+      tdReg.innerHTML = regionsArr.length
+        ? regionsArr.map(r => escapeHtml(r)).join(", ")
+        : "<span class='small-text'>—</span>";
+
+      const tdProc = document.createElement("td");
+      if (entry.processes.length) {
+        const combined = entry.processes[0];
+        tdProc.innerHTML = escapeHtml(truncate(combined, 220)).replace(/\n/g, "<br>");
+      } else {
+        tdProc.innerHTML = "<span class='small-text'>—</span>";
+      }
+
+      tr.appendChild(tdFil);
+      tr.appendChild(tdProd);
+      tr.appendChild(tdReg);
+      tr.appendChild(tdProc);
+
+      productsTbody.appendChild(tr);
+    });
+  }
+
+  // Stats helpers
+  function buildCountMap(values) {
+    const map = {};
+    values.forEach(v => {
+      const key = (v || "").trim();
+      if (!key) return;
+      map[key] = (map[key] || 0) + 1;
+    });
+    return map;
+  }
+
+  function renderStatsTable(tbodyEl, countMap) {
+    if (!tbodyEl) return;
+    tbodyEl.innerHTML = "";
+    const entries = Object.entries(countMap).sort((a,b) => b[1] - a[1]);
+    if (!entries.length) {
+      const tr = document.createElement("tr");
+      const td = document.createElement("td");
+      td.colSpan = 2;
+      td.className = "no-data";
+      td.textContent = "Aucune donnée disponible.";
+      tr.appendChild(td);
+      tbodyEl.appendChild(tr);
+      return;
+    }
+    entries.forEach(([label, count]) => {
+      const tr = document.createElement("tr");
+      const tdLabel = document.createElement("td");
+      const tdCount = document.createElement("td");
+      tdLabel.textContent = label;
+      tdCount.textContent = String(count);
+      tr.appendChild(tdLabel);
+      tr.appendChild(tdCount);
+      tbodyEl.appendChild(tr);
+    });
+  }
+
+  function renderBarChart(containerEl, countMap) {
+    if (!containerEl) return;
+    containerEl.innerHTML = "";
+    const entries = Object.entries(countMap).sort((a, b) => b[1] - a[1]);
+    if (!entries.length) {
+      const div = document.createElement("div");
+      div.className = "no-data";
+      div.textContent = "Aucune donnée disponible.";
+      containerEl.appendChild(div);
+      return;
+    }
+    const max = entries[0][1];
+    entries.forEach(([label, count]) => {
+      const row = document.createElement("div");
+      row.className = "chart-row";
+
+      const labelDiv = document.createElement("div");
+      labelDiv.className = "chart-label";
+      labelDiv.textContent = label;
+
+      const barWrapper = document.createElement("div");
+      barWrapper.className = "chart-bar-wrapper";
+
+      const bar = document.createElement("div");
+      bar.className = "chart-bar";
+      const width = (count / max) * 100;
+      bar.style.width = width + "%";
+
+      const valueSpan = document.createElement("span");
+      valueSpan.className = "chart-value";
+      valueSpan.textContent = String(count);
+
+      barWrapper.appendChild(bar);
+      barWrapper.appendChild(valueSpan);
+
+      row.appendChild(labelDiv);
+      row.appendChild(barWrapper);
+
+      containerEl.appendChild(row);
+    });
+  }
+
+  function extractNormalizedFilieres(str) {
+    if (!str) return [];
+    return str
+      .split(/[;,/]/)
+      .map(part => part.trim())
+      .filter(Boolean)
+      .map(part => {
+        let s = part.toLowerCase();
+        s = s.replace(/\(.*?\)/g, "").trim();
+        const firstWord = s.split(/\s+/)[0];
+        if (!firstWord) return "";
+        return firstWord.charAt(0).toUpperCase() + firstWord.slice(1);
+      })
+      .filter(Boolean);
+  }
+
+  function renderStats() {
+    const regionCounts = buildCountMap(studies.map(s => s.regionStudy || s.region));
+    const allFilieres = [];
+    studies.forEach(s => {
+      const list = extractNormalizedFilieres(s.filiere || "");
+      list.forEach(v => allFilieres.push(v));
+    });
+    const filiereCounts = buildCountMap(allFilieres);
+    const instCounts = buildCountMap(studies.map(s => s.institution));
+
+    renderBarChart(statsRegionChart, regionCounts);
+    renderBarChart(statsFiliereChart, filiereCounts);
+    renderStatsTable(statsInstitutionTableBody, instCounts);
+  }
+
+  // Export Excel
+  function exportToExcel() {
+    if (typeof XLSX === "undefined") {
+      alert("La librairie Excel n’a pas pu être chargée.");
+      return;
+    }
+    if (!studies.length) {
+      alert("Aucune fiche à exporter.");
+      return;
+    }
+    const data = studies.map(s => ({
+      titre: s.title || "",
+      institution: s.institution || "",
+      annee: s.year || "",
+      auteur: s.author || "",
+      co_auteurs: s.coauthors || "",
+      email: s.email || "",
+      telephone: s.phone || "",
+      categorie_scientifique: s.domain || "",
+      filiere: s.filiere || "",
+      produit_final: s.product_final || "",
+      region_etude: s.regionStudy || s.region || "",
+      zone_etude: s.zoneStudy || "",
+      region_chercheur: s.regionResearcher || "",
+      groupe_cible: s.target || "",
+      mots_cles: s.keywords || "",
+      resume: s.summary || "",
+      productions: s.products || "",
+      potentiel_vulgarisation: s.disseminationPotential || "",
+      commentaire_potentiel: s.disseminationNotes || "",
+      communications: s.communications || "",
+      liens: s.links || "",
+      autres_infos: s.other || ""
+    }));
+    const ws = XLSX.utils.json_to_sheet(data);
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, "Mikasa_nutrition");
+    XLSX.writeFile(wb, "mikasa_nutrition.xlsx");
+  }
+
+  // Import Excel
+  function importFromExcel(file) {
+    if (typeof XLSX === "undefined") {
+      alert("La librairie Excel n’a pas pu être chargée.");
+      return;
+    }
+    const reader = new FileReader();
+    reader.onload = function (e) {
+      const data = new Uint8Array(e.target.result);
+      const workbook = XLSX.read(data, { type: "array" });
+
+      if (!workbook.SheetNames.length) {
+        alert("Aucune feuille trouvée dans ce fichier.");
+        return;
+      }
+
+      const sheetNames = workbook.SheetNames;
+      const chosen = prompt(
+        "Nom de la feuille à importer :\n" + sheetNames.join(", "),
+        sheetNames[0]
+      );
+      if (!chosen || !sheetNames.includes(chosen)) {
+        alert("Feuille non trouvée. Import annulé.");
+        return;
+      }
+
+      const ws = workbook.Sheets[chosen];
+      const rows = XLSX.utils.sheet_to_json(ws, { defval: "" });
+      if (!rows.length) {
+        alert("La feuille sélectionnée ne contient aucune ligne lisible.");
+        return;
+      }
+
+      const mode = importModeSelect ? importModeSelect.value : "append";
+      if (mode === "overwrite") {
+        if (!askValidationCode("écraser toutes les fiches existantes")) return;
+        studies = [];
+      }
+
+      rows.forEach(row => {
+        let cat = row.categorie_scientifique || row.domaine || row.domain || "";
+        const typeOld = row.type_recherche || row.type || "";
+        if (typeOld) {
+          if (cat && !cat.includes(typeOld)) {
+            cat = cat + " | " + typeOld;
+          } else if (!cat) {
+            cat = typeOld;
+          }
+        }
+
+        const regionEtude = row.region_etude || row.regionStudy || row.region || row.zone || "";
+        const zoneEtude = row.zone_etude || row.zoneStudy || "";
+        const regionChercheur = row.region_chercheur || row.regionResearcher || "";
+
+        const study = {
+          title: row.titre || row.title || "",
+          institution: row.institution || "",
+          year: String(row.annee || row.year || "").trim(),
+          author: row.auteur || row.author || "",
+          coauthors: row.co_auteurs || row.coauthors || "",
+          email: row.email || "",
+          phone: row.telephone || row.phone || "",
+          domain: cat || "",
+          filiere: row.filiere || "",
+          product_final: row.produit_final || row.product_final || "",
+          regionStudy: regionEtude,
+          zoneStudy: zoneEtude,
+          regionResearcher: regionChercheur,
+          target: row.groupe_cible || row.target || "",
+          keywords: row.mots_cles || row.keywords || "",
+          summary: row.resume || row.summary || "",
+          products: row.productions || row.produits_developpes || row.produits || row.products || "",
+          disseminationPotential: String(row.potentiel_vulgarisation || row.disseminationPotential || "").trim(),
+          disseminationNotes: row.commentaire_potentiel || row.disseminationNotes || "",
+          communications: row.communications || "",
+          links: row.liens || row.links || "",
+          other: row.autres_infos || row.other || ""
+        };
+        studies.push(study);
+      });
+
+      saveToStorage();
+      renderTable();
+      renderStats();
+      renderProductsTable();
+      alert(rows.length + " fiche(s) importée(s).");
+    };
+    reader.readAsArrayBuffer(file);
+  }
+
+  function removeDuplicates() {
+    if (!studies.length) {
+      alert("Aucune fiche à dédoublonner.");
+      return;
+    }
+    if (!askValidationCode("supprimer les doublons")) return;
+
+    const seen = {};
+    const unique = [];
+    let removed = 0;
+
+    studies.forEach(study => {
+      const key =
+        (study.title || "").trim().toLowerCase() + "|" +
+        (study.institution || "").trim().toLowerCase() + "|" +
+        (study.year || "").trim();
+      if (seen[key]) {
+        removed += 1;
+      } else {
+        seen[key] = true;
+        unique.push(study);
+      }
+    });
+
+    studies = unique;
+    saveToStorage();
+    renderTable();
+    renderStats();
+    renderProductsTable();
+    alert(removed + " doublon(s) supprimé(s).");
+  }
+
+  function deleteSelected() {
+    const checkboxes = Array.from(document.querySelectorAll(".row-select:checked"));
+    if (!checkboxes.length) {
+      alert("Aucune fiche sélectionnée.");
+      return;
+    }
+    if (!askValidationCode("supprimer les fiches sélectionnées")) return;
+
+    const indexes = checkboxes.map(cb => parseInt(cb.dataset.index, 10))
+      .filter(i => !isNaN(i));
+    const uniqueIdx = Array.from(new Set(indexes)).sort((a,b) => b - a);
+
+    if (!uniqueIdx.length) {
+      alert("Aucune fiche valide à supprimer.");
+      return;
+    }
+
+    if (!confirm("Supprimer " + uniqueIdx.length + " fiche(s) sélectionnée(s) ?")) return;
+
+    uniqueIdx.forEach(i => {
+      if (i >= 0 && i < studies.length) {
+        studies.splice(i, 1);
+      }
+    });
+
+    saveToStorage();
+    renderTable();
+    renderStats();
+    renderProductsTable();
+  }
+
+  // Écouteurs
+  if (form) {
+    form.addEventListener("submit", function (e) {
+      e.preventDefault();
+
+      if (!fields.title.value.trim()) {
+        alert("Merci de renseigner au moins le titre de la recherche.");
+        return;
+      }
+
+      let editIndex = parseInt(editIndexInput.value, 10);
+      if (editIndex >= 0 && editIndex < studies.length) {
+        if (!askValidationCode("mettre à jour cette fiche")) return;
+      }
+
+      fields.products.value = buildProductsString();
+
+      const study = {};
+      for (const key in fields) {
+        study[key] = fields[key].value.trim();
+      }
+
+      if (editIndex >= 0 && editIndex < studies.length) {
+        studies[editIndex] = { ...studies[editIndex], ...study };
+      } else {
+        studies.push(study);
+      }
+
+      saveToStorage();
+      renderTable();
+      renderStats();
+      renderProductsTable();
+      clearForm();
+    });
+  }
+
+  if (searchInput) {
+    searchInput.addEventListener("input", () => {
+      renderTable();
+    });
+  }
+
+  if (resetBtn) {
+    resetBtn.addEventListener("click", clearForm);
+  }
+
+  if (exportExcelBtn) {
+    exportExcelBtn.addEventListener("click", exportToExcel);
+  }
+
+  if (importExcelInput) {
+    importExcelInput.addEventListener("change", (e) => {
+      const file = e.target.files[0];
+      if (file) {
+        importFromExcel(file);
+        importExcelInput.value = "";
+      }
+    });
+  }
+
+  if (bulkDeleteBtn) {
+    bulkDeleteBtn.addEventListener("click", deleteSelected);
+  }
+  if (dedupeBtn) {
+    dedupeBtn.addEventListener("click", removeDuplicates);
+  }
+
+  if (selectAllCheckbox) {
+    selectAllCheckbox.addEventListener("change", () => {
+      const checked = selectAllCheckbox.checked;
+      const cbs = document.querySelectorAll(".row-select");
+      cbs.forEach(cb => {
+        cb.checked = checked;
+      });
+    });
+  }
+
+  // Init
+  loadFromStorage();
+})();
+</script>
+
+</body>
+</html>
