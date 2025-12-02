@@ -54,10 +54,7 @@
       display: inline-flex;
       align-items: center;
       gap: 6px;
-    }
-
-    .tab-button span.icon {
-      font-size: 0.95rem;
+      letter-spacing: 0.01em;
     }
 
     .tab-button.active {
@@ -291,7 +288,7 @@
       flex-wrap: wrap;
       gap: 10px;
       align-items: center;
-      margin-bottom: 8px;
+      margin-bottom: 4px;
     }
 
     #search-input {
@@ -384,7 +381,7 @@
       font-size: 0.85rem;
     }
 
-    /* Modal détails */
+    /* Modal générique */
     .modal-backdrop {
       position: fixed;
       inset: 0;
@@ -581,6 +578,57 @@
       font-size: 0.8rem;
     }
 
+    /* Produits : modal fiches sources */
+    .product-source-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      padding: 6px 0;
+      border-bottom: 1px dashed #e5e7eb;
+      flex-wrap: wrap;
+    }
+
+    .product-source-main {
+      flex: 1;
+      min-width: 220px;
+    }
+
+    /* Dédoublonnage */
+    .dedupe-group {
+      border: 1px solid #e5e7eb;
+      border-radius: 8px;
+      padding: 8px 10px;
+      margin-bottom: 10px;
+      background: #f9fafb;
+    }
+
+    .dedupe-group-title {
+      font-weight: 600;
+      font-size: 0.9rem;
+      margin-bottom: 6px;
+      color: #111827;
+    }
+
+    .dedupe-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 4px 0;
+      border-top: 1px dashed #e5e7eb;
+      margin-top: 4px;
+      flex-wrap: wrap;
+    }
+
+    .dedupe-item:first-of-type {
+      border-top: none;
+      margin-top: 0;
+    }
+
+    .dedupe-item-info {
+      font-size: 0.82rem;
+    }
+
     @media (max-width: 768px) {
       .card {
         padding: 12px 12px;
@@ -620,18 +668,10 @@
 
   <!-- ONGLET -->
   <div class="tabs">
-    <button class="tab-button active" data-tab="form">
-      <span class="icon">📝</span> Fiche
-    </button>
-    <button class="tab-button" data-tab="table">
-      <span class="icon">📋</span> Tableau
-    </button>
-    <button class="tab-button" data-tab="products">
-      <span class="icon">🍽️</span> Produits
-    </button>
-    <button class="tab-button" data-tab="stats">
-      <span class="icon">📊</span> Statistiques
-    </button>
+    <button class="tab-button active" data-tab="form">Fiche</button>
+    <button class="tab-button" data-tab="table">Tableau</button>
+    <button class="tab-button" data-tab="products">Produits</button>
+    <button class="tab-button" data-tab="stats">Statistiques</button>
   </div>
 
   <!-- ONGLET FICHE -->
@@ -855,6 +895,9 @@
                placeholder="Filtrer par titre, institution, auteur, mots-clés, région, filière..." />
         <span class="hint">Filtrage plein texte sur les colonnes principales.</span>
       </div>
+      <div class="hint" id="table-count-hint" style="margin-bottom:6px;">
+        0 fiche(s) affichée(s) sur 0
+      </div>
 
       <div class="actions-row" style="margin-top:4px; justify-content:flex-start; align-items:center;">
         <button type="button" class="btn-primary btn-small" id="export-excel-btn">
@@ -910,7 +953,7 @@
         </div>
       </div>
       <p class="hint" style="margin-bottom:8px;">
-        Synthèse des produits finaux, regroupés par filière et associés aux régions d’étude. Le texte reprend les éléments des fiches (résumé, autres infos).
+        Synthèse des produits finaux, regroupés par filière et associés aux régions d’étude. Un accès direct aux fiches sources est disponible pour chaque ligne.
       </p>
       <div style="overflow-x:auto; max-height: 420px; margin-top: 6px;">
         <table>
@@ -920,6 +963,7 @@
             <th>Produit final</th>
             <th>Régions d’étude</th>
             <th>Processus / remarques issues des fiches</th>
+            <th>Fiches sources</th>
           </tr>
           </thead>
           <tbody id="products-tbody"></tbody>
@@ -1002,6 +1046,56 @@
   </div>
 </div>
 
+<!-- MODAL FICHES SOURCES PRODUIT -->
+<div id="product-sources-modal" class="modal-backdrop">
+  <div class="modal-content">
+    <div class="modal-header">
+      <div class="modal-title">
+        <span class="icon">📑</span>
+        <span id="product-sources-title">Fiches sources du produit</span>
+      </div>
+      <button class="modal-close" id="product-sources-close-btn">
+        <span class="icon">✖</span>
+        <span>Fermer</span>
+      </button>
+    </div>
+    <div class="modal-body">
+      <p class="hint" style="margin-bottom:8px;">
+        Chaque ligne correspond à une fiche de recherche qui mentionne ce produit. Le bouton “Voir la fiche” ouvre le détail complet.
+      </p>
+      <div id="product-sources-list"></div>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL DÉDOUBLONNAGE -->
+<div id="dedupe-modal" class="modal-backdrop">
+  <div class="modal-content">
+    <div class="modal-header">
+      <div class="modal-title">
+        <span class="icon">♻️</span>
+        <span>Vérification des doublons</span>
+      </div>
+      <button class="modal-close" id="dedupe-cancel-btn">
+        <span class="icon">✖</span>
+        <span>Fermer</span>
+      </button>
+    </div>
+    <div class="modal-body">
+      <p class="hint">
+        Les groupes ci-dessous rassemblent les fiches qui partagent le même trio (titre, institution, année). 
+        Cochez les fiches à supprimer, puis validez.
+      </p>
+      <div id="dedupe-list" style="margin-top:8px;"></div>
+      <div class="actions-row" style="justify-content:flex-end; margin-top:12px;">
+        <button type="button" class="btn-primary btn-small" id="dedupe-confirm-btn">
+          Supprimer les fiches cochées
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
 <!-- Liste de régions pour autocomplétion -->
 <datalist id="regions-list">
   <option value="Analamanga"></option>
@@ -1049,6 +1143,7 @@
   const productsTbody = document.getElementById("products-tbody");
   const resetBtn = document.getElementById("reset-btn");
   const submitBtn = document.getElementById("submit-btn");
+  const tableCountHint = document.getElementById("table-count-hint");
 
   const exportExcelBtn = document.getElementById("export-excel-btn");
   const importExcelInput = document.getElementById("import-excel-input");
@@ -1090,6 +1185,18 @@
   const detailGrid = document.getElementById("detail-grid");
   const detailTitle = document.getElementById("detail-title");
   const detailCloseBtn = document.getElementById("detail-close-btn");
+
+  // Modal fiches sources produits
+  const productSourcesModal = document.getElementById("product-sources-modal");
+  const productSourcesTitle = document.getElementById("product-sources-title");
+  const productSourcesList = document.getElementById("product-sources-list");
+  const productSourcesCloseBtn = document.getElementById("product-sources-close-btn");
+
+  // Modal dédoublonnage
+  const dedupeModal = document.getElementById("dedupe-modal");
+  const dedupeList = document.getElementById("dedupe-list");
+  const dedupeConfirmBtn = document.getElementById("dedupe-confirm-btn");
+  const dedupeCancelBtn = document.getElementById("dedupe-cancel-btn");
 
   // Onglets
   const tabButtons = document.querySelectorAll(".tab-button");
@@ -1358,6 +1465,69 @@
     });
   }
 
+  // Modal fiches sources produits
+  function openProductSourcesModal(entry) {
+    if (!productSourcesModal || !productSourcesList) return;
+    const label = (entry.filiere || "") + (entry.product_final ? " – " + entry.product_final : "");
+    productSourcesTitle.textContent = label || "Fiches sources du produit";
+
+    productSourcesList.innerHTML = "";
+
+    if (!entry.indexes || !entry.indexes.length) {
+      const div = document.createElement("div");
+      div.className = "no-data";
+      div.textContent = "Aucune fiche source trouvée pour ce produit.";
+      productSourcesList.appendChild(div);
+      productSourcesModal.classList.add("show");
+      return;
+    }
+
+    entry.indexes.forEach(idx => {
+      const s = studies[idx];
+      if (!s) return;
+
+      const item = document.createElement("div");
+      item.className = "product-source-item";
+
+      const main = document.createElement("div");
+      main.className = "product-source-main";
+      main.innerHTML =
+        "<strong>" + escapeHtml(s.title || "Sans titre") + "</strong><br>" +
+        "<span class='small-text'>" +
+        escapeHtml(s.institution || "") +
+        (s.year ? " • " + escapeHtml(String(s.year)) : "") +
+        "</span>";
+
+      const btn = document.createElement("button");
+      btn.type = "button";
+      btn.className = "btn-chip btn-chip-info";
+      btn.innerHTML = '<span class="icon">🔍</span><span>Voir la fiche</span>';
+      btn.addEventListener("click", (e) => {
+        e.preventDefault();
+        openDetailModal(idx);
+      });
+
+      item.appendChild(main);
+      item.appendChild(btn);
+      productSourcesList.appendChild(item);
+    });
+
+    productSourcesModal.classList.add("show");
+  }
+
+  function closeProductSourcesModal() {
+    if (productSourcesModal) {
+      productSourcesModal.classList.remove("show");
+    }
+  }
+
+  if (productSourcesCloseBtn && productSourcesModal) {
+    productSourcesCloseBtn.addEventListener("click", closeProductSourcesModal);
+    productSourcesModal.addEventListener("click", (e) => {
+      if (e.target === productSourcesModal) closeProductSourcesModal();
+    });
+  }
+
   // Tableau principal
   function renderTable() {
     if (!tbody) return;
@@ -1386,6 +1556,12 @@
         (s.products || "");
       return text.toLowerCase().includes(filter);
     });
+
+    // Info de comptage
+    if (tableCountHint) {
+      tableCountHint.textContent =
+        filtered.length + " fiche(s) affichée(s) sur " + studies.length;
+    }
 
     if (filtered.length === 0) {
       const tr = document.createElement("tr");
@@ -1494,7 +1670,7 @@
     productsTbody.innerHTML = "";
 
     const map = {};
-    studies.forEach(s => {
+    studies.forEach((s, index) => {
       const fil = (s.filiere || "").trim();
       const prod = (s.product_final || "").trim();
       if (!fil && !prod) return;
@@ -1504,9 +1680,12 @@
           filiere: fil,
           product_final: prod,
           regions: new Set(),
-          processes: []
+          processes: [],
+          indexes: []
         };
       }
+      map[key].indexes.push(index);
+
       const regionLabel = (s.regionStudy || s.region || "").trim();
       if (regionLabel) {
         map[key].regions.add(regionLabel);
@@ -1525,7 +1704,7 @@
     if (!entries.length) {
       const tr = document.createElement("tr");
       const td = document.createElement("td");
-      td.colSpan = 4;
+      td.colSpan = 5;
       td.className = "no-data";
       td.textContent = "Aucun produit n’est disponible dans les fiches pour le moment.";
       tr.appendChild(td);
@@ -1567,10 +1746,26 @@
         tdProc.innerHTML = "<span class='small-text'>—</span>";
       }
 
+      const tdSources = document.createElement("td");
+      if (entry.indexes && entry.indexes.length) {
+        const btn = document.createElement("button");
+        btn.type = "button";
+        btn.className = "btn-chip btn-chip-info";
+        btn.innerHTML =
+          '<span class="icon">📑</span><span>' +
+          entry.indexes.length +
+          " fiche(s)</span>";
+        btn.addEventListener("click", () => openProductSourcesModal(entry));
+        tdSources.appendChild(btn);
+      } else {
+        tdSources.innerHTML = "<span class='small-text'>—</span>";
+      }
+
       tr.appendChild(tdFil);
       tr.appendChild(tdProd);
       tr.appendChild(tdReg);
       tr.appendChild(tdProc);
+      tr.appendChild(tdSources);
 
       productsTbody.appendChild(tr);
     });
@@ -1601,7 +1796,9 @@
       tbodyEl.appendChild(tr);
       return;
     }
+    let total = 0;
     entries.forEach(([label, count]) => {
+      total += count;
       const tr = document.createElement("tr");
       const tdLabel = document.createElement("td");
       const tdCount = document.createElement("td");
@@ -1611,6 +1808,17 @@
       tr.appendChild(tdCount);
       tbodyEl.appendChild(tr);
     });
+
+    const trTotal = document.createElement("tr");
+    const tdLabelTotal = document.createElement("td");
+    const tdCountTotal = document.createElement("td");
+    tdLabelTotal.textContent = "Total";
+    tdLabelTotal.style.fontWeight = "600";
+    tdCountTotal.textContent = String(total);
+    tdCountTotal.style.fontWeight = "600";
+    trTotal.appendChild(tdLabelTotal);
+    trTotal.appendChild(tdCountTotal);
+    tbodyEl.appendChild(trTotal);
   }
 
   function renderBarChart(containerEl, countMap) {
@@ -1816,36 +2024,145 @@
     reader.readAsArrayBuffer(file);
   }
 
+  // Dédoublonnage avec validation visuelle
   function removeDuplicates() {
     if (!studies.length) {
       alert("Aucune fiche à dédoublonner.");
       return;
     }
-    if (!askValidationCode("supprimer les doublons")) return;
 
-    const seen = {};
-    const unique = [];
-    let removed = 0;
+    if (!askValidationCode("analyser les doublons")) return;
 
-    studies.forEach(study => {
+    const map = {};
+    studies.forEach((study, index) => {
       const key =
         (study.title || "").trim().toLowerCase() + "|" +
         (study.institution || "").trim().toLowerCase() + "|" +
         (study.year || "").trim();
-      if (seen[key]) {
-        removed += 1;
-      } else {
-        seen[key] = true;
-        unique.push(study);
-      }
+      if (!key.trim()) return;
+      if (!map[key]) map[key] = [];
+      map[key].push(index);
     });
 
-    studies = unique;
-    saveToStorage();
-    renderTable();
-    renderStats();
-    renderProductsTable();
-    alert(removed + " doublon(s) supprimé(s).");
+    const groups = Object.values(map).filter(idxs => idxs.length > 1);
+    if (!groups.length) {
+      alert("Aucun doublon potentiel détecté sur la base (titre, institution, année).");
+      return;
+    }
+
+    if (!dedupeModal || !dedupeList) {
+      alert("Interface de dédoublonnage indisponible.");
+      return;
+    }
+
+    dedupeList.innerHTML = "";
+
+    groups.forEach((indexes) => {
+      const groupDiv = document.createElement("div");
+      groupDiv.className = "dedupe-group";
+
+      const firstStudy = studies[indexes[0]] || {};
+      const titleText = (firstStudy.title || "Sans titre");
+      const instText = (firstStudy.institution || "");
+      const yearText = (firstStudy.year || "");
+
+      const groupTitle = document.createElement("div");
+      groupTitle.className = "dedupe-group-title";
+      groupTitle.textContent = titleText + " | " + instText + " | " + yearText;
+      groupDiv.appendChild(groupTitle);
+
+      indexes.forEach((idx, pos) => {
+        const s = studies[idx];
+        if (!s) return;
+
+        const item = document.createElement("label");
+        item.className = "dedupe-item";
+
+        const cb = document.createElement("input");
+        cb.type = "checkbox";
+        cb.className = "dedupe-checkbox";
+        cb.dataset.index = String(idx);
+        // On propose par défaut la suppression des fiches après la première
+        cb.checked = pos > 0;
+
+        const info = document.createElement("div");
+        info.className = "dedupe-item-info";
+        info.innerHTML =
+          "<strong>" + escapeHtml(s.title || "Sans titre") + "</strong><br>" +
+          "<span class='small-text'>" +
+          escapeHtml(s.institution || "") +
+          (s.year ? " • " + escapeHtml(String(s.year)) : "") +
+          (s.regionStudy || s.region ? " • " + escapeHtml(s.regionStudy || s.region) : "") +
+          "</span>";
+
+        const btn = document.createElement("button");
+        btn.type = "button";
+        btn.className = "btn-chip btn-chip-info";
+        btn.innerHTML = '<span class="icon">🔍</span><span>Voir la fiche</span>';
+        btn.addEventListener("click", (e) => {
+          e.preventDefault();
+          openDetailModal(idx);
+        });
+
+        item.appendChild(cb);
+        item.appendChild(info);
+        item.appendChild(btn);
+
+        groupDiv.appendChild(item);
+      });
+
+      dedupeList.appendChild(groupDiv);
+    });
+
+    dedupeModal.classList.add("show");
+  }
+
+  function closeDedupeModal() {
+    if (dedupeModal) dedupeModal.classList.remove("show");
+  }
+
+  if (dedupeCancelBtn && dedupeModal) {
+    dedupeCancelBtn.addEventListener("click", closeDedupeModal);
+    dedupeModal.addEventListener("click", (e) => {
+      if (e.target === dedupeModal) closeDedupeModal();
+    });
+  }
+
+  if (dedupeConfirmBtn) {
+    dedupeConfirmBtn.addEventListener("click", () => {
+      const checkedBoxes = Array.from(document.querySelectorAll(".dedupe-checkbox:checked"));
+      if (!checkedBoxes.length) {
+        alert("Aucune fiche cochée pour suppression.");
+        return;
+      }
+
+      if (!askValidationCode("supprimer les doublons cochés")) return;
+
+      const indexes = Array.from(new Set(
+        checkedBoxes
+          .map(cb => parseInt(cb.dataset.index, 10))
+          .filter(i => !isNaN(i))
+      )).sort((a, b) => b - a);
+
+      if (!indexes.length) {
+        alert("Aucune fiche valide à supprimer.");
+        return;
+      }
+
+      if (!confirm("Supprimer " + indexes.length + " fiche(s) sélectionnée(s) ?")) return;
+
+      indexes.forEach(i => {
+        if (i >= 0 && i < studies.length) {
+          studies.splice(i, 1);
+        }
+      });
+
+      saveToStorage();
+      renderTable();
+      renderStats();
+      renderProductsTable();
+      closeDedupeModal();
+    });
   }
 
   function deleteSelected() {
