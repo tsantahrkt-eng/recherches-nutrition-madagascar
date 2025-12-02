@@ -1883,33 +1883,47 @@
   }
 
   // Découpage des filières pour les stats et le filtre
-  function extractFilieresForStats(str) {
-    if (!str) return [];
-    return str
-      .split(/[;,/]/) // coupe sur ; , ou /
-      .map(part => {
-        let s = part.trim();
-        if (!s) return "";
+ function extractFilieresForStats(str) {
+  if (!str) return [];
+  return str
+    // on coupe sur ; , ou /
+    .split(/[;,/]/)
+    .map(part => {
+      let s = part.trim();
+      if (!s) return "";
 
-        // retirer "etc." ou "etc"
-        s = s.replace(/\betc\.?\b/gi, "");
+      // retirer "etc." ou "etc"
+      s = s.replace(/\betc\.?\b/gi, "");
 
-        // retirer le texte entre parenthèses
-        s = s.replace(/\(.*?\)/g, "");
+      // retirer le texte entre parenthèses
+      s = s.replace(/\(.*?\)/g, "");
 
-        s = s.trim();
-        if (!s) return "";
+      // retirer toutes parenthèses restantes au cas où
+      s = s.replace(/[()]/g, "");
 
-        // normalisation simple : majuscule au début de chaque mot
-        s = s
-          .split(/\s+/)
-          .map(w => w.charAt(0).toUpperCase() + w.slice(1))
-          .join(" ");
+      // nettoyer ponctuation et tirets au début/à la fin
+      s = s.replace(/^[\s\-–—:,.]+/, "");
+      s = s.replace(/[\s\-–—:,.]+$/, "");
 
-        return s;
-      })
-      .filter(Boolean);
-  }
+      s = s.trim();
+      if (!s) return "";
+
+      // compresser les espaces multiples
+      s = s.replace(/\s+/g, " ");
+
+      // Normaliser les majuscules : première lettre de chaque mot
+      s = s
+        .split(" ")
+        .map(w => {
+          if (!w) return "";
+          return w.charAt(0).toUpperCase() + w.slice(1).toLowerCase();
+        })
+        .join(" ");
+
+      return s;
+    })
+    .filter(Boolean);
+}
 
   function updateFiliereFilterOptions() {
     if (!filterFiliereSelect) return;
