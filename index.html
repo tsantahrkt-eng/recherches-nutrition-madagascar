@@ -895,8 +895,15 @@
                placeholder="Filtrer par titre, institution, auteur, mots-clés, région, filière..." />
         <span class="hint">Filtrage plein texte sur les colonnes principales.</span>
       </div>
-      <div class="hint" id="table-count-hint" style="margin-bottom:6px;">
-        0 fiche(s) affichée(s) sur 0
+
+      <div style="display:flex; flex-wrap:wrap; gap:8px; align-items:center; margin-bottom:6px;">
+        <label for="filter-filiere" class="hint">Filtrer par filière :</label>
+        <select id="filter-filiere" style="min-width:160px; padding:4px 8px; font-size:0.8rem;">
+          <option value="">Toutes les filières</option>
+        </select>
+        <span class="hint" id="table-count-hint">
+          0 fiche(s) affichée(s) sur 0
+        </span>
       </div>
 
       <div class="actions-row" style="margin-top:4px; justify-content:flex-start; align-items:center;">
@@ -953,7 +960,7 @@
         </div>
       </div>
       <p class="hint" style="margin-bottom:8px;">
-        Synthèse des produits finaux, regroupés par filière et associés aux régions d’étude. Un accès direct aux fiches sources est disponible pour chaque ligne.
+        Synthèse des produits finaux, regroupés par filière et associés aux régions d’étude. La colonne “Processus / remarques” reprend uniquement les résumés des fiches, avec accès direct aux fiches sources.
       </p>
       <div style="overflow-x:auto; max-height: 420px; margin-top: 6px;">
         <table>
@@ -1003,8 +1010,8 @@
           <span>Répartition par filière</span>
         </div>
         <div class="stats-meta">
-          <span class="stats-badge">Regroupement simplifié</span>
-          <span>Regroupement par premier mot (par ex. “Banane esp. Musa” → “Banane”).</span>
+          <span class="stats-badge">Filières multiples comptées séparément</span>
+          <span>Une même fiche peut compter pour plusieurs filières (Riz / Maïs / Manioc → Riz, Maïs et Manioc). Les mentions génériques comme “etc.” sont ignorées.</span>
         </div>
         <div id="stats-filiere-chart" class="chart-block"></div>
       </div>
@@ -1083,7 +1090,7 @@
     </div>
     <div class="modal-body">
       <p class="hint">
-        Les groupes ci-dessous rassemblent les fiches qui partagent le même trio (titre, institution, année). 
+        Les groupes ci-dessous rassemblent les fiches qui partagent le même trio (titre, institution, année).
         Cochez les fiches à supprimer, puis validez.
       </p>
       <div id="dedupe-list" style="margin-top:8px;"></div>
@@ -1144,6 +1151,7 @@
   const resetBtn = document.getElementById("reset-btn");
   const submitBtn = document.getElementById("submit-btn");
   const tableCountHint = document.getElementById("table-count-hint");
+  const filterFiliereSelect = document.getElementById("filter-filiere");
 
   const exportExcelBtn = document.getElementById("export-excel-btn");
   const importExcelInput = document.getElementById("import-excel-input");
@@ -1536,25 +1544,38 @@
     if (selectAllCheckbox) selectAllCheckbox.checked = false;
 
     const filter = (searchInput && searchInput.value || "").toLowerCase().trim();
+    const filiereFilter = filterFiliereSelect ? filterFiliereSelect.value : "";
 
     const filtered = studies.filter((s) => {
-      if (!filter) return true;
-      const text =
-        (s.title || "") + " " +
-        (s.institution || "") + " " +
-        (s.author || "") + " " +
-        (s.coauthors || "") + " " +
-        (s.domain || "") + " " +
-        (s.filiere || "") + " " +
-        (s.product_final || "") + " " +
-        (s.regionStudy || s.region || "") + " " +
-        (s.zoneStudy || "") + " " +
-        (s.regionResearcher || "") + " " +
-        (s.target || "") + " " +
-        (s.keywords || "") + " " +
-        (s.summary || "") + " " +
-        (s.products || "");
-      return text.toLowerCase().includes(filter);
+      // filtre texte plein
+      const matchesText = (function () {
+        if (!filter) return true;
+        const text =
+          (s.title || "") + " " +
+          (s.institution || "") + " " +
+          (s.author || "") + " " +
+          (s.coauthors || "") + " " +
+          (s.domain || "") + " " +
+          (s.filiere || "") + " " +
+          (s.product_final || "") + " " +
+          (s.regionStudy || s.region || "") + " " +
+          (s.zoneStudy || "") + " " +
+          (s.regionResearcher || "") + " " +
+          (s.target || "") + " " +
+          (s.keywords || "") + " " +
+          (s.summary || "") + " " +
+          (s.products || "");
+        return text.toLowerCase().includes(filter);
+      })();
+
+      // filtre par filière (en utilisant le même découpage que les stats)
+      const matchesFiliere = (function () {
+        if (!filiereFilter) return true;
+        const list = extractFilieresForStats(s.filiere || "");
+        return list.includes(filiereFilter);
+      })();
+
+      return matchesText && matchesFiliere;
     });
 
     // Info de comptage
@@ -1691,12 +1712,10 @@
         map[key].regions.add(regionLabel);
       }
 
-      const procParts = [];
-      if (s.other) procParts.push(s.other);
-      if (s.summary) procParts.push(s.summary);
-      const processText = procParts.join("\n\n").trim();
-      if (processText) {
-        map[key].processes.push(processText);
+      // Processus : uniquement le résumé de la fiche
+      const summaryText = (s.summary || "").trim();
+      if (summaryText) {
+        map[key].processes.push(summaryText);
       }
     });
 
@@ -1863,35 +1882,83 @@
     });
   }
 
-  function extractNormalizedFilieres(str) {
+  // Découpage des filières pour les stats et le filtre
+  function extractFilieresForStats(str) {
     if (!str) return [];
     return str
-      .split(/[;,/]/)
-      .map(part => part.trim())
-      .filter(Boolean)
+      .split(/[;,/]/) // coupe sur ; , ou /
       .map(part => {
-        let s = part.toLowerCase();
-        s = s.replace(/\(.*?\)/g, "").trim();
-        const firstWord = s.split(/\s+/)[0];
-        if (!firstWord) return "";
-        return firstWord.charAt(0).toUpperCase() + firstWord.slice(1);
+        let s = part.trim();
+        if (!s) return "";
+
+        // retirer "etc." ou "etc"
+        s = s.replace(/\betc\.?\b/gi, "");
+
+        // retirer le texte entre parenthèses
+        s = s.replace(/\(.*?\)/g, "");
+
+        s = s.trim();
+        if (!s) return "";
+
+        // normalisation simple : majuscule au début de chaque mot
+        s = s
+          .split(/\s+/)
+          .map(w => w.charAt(0).toUpperCase() + w.slice(1))
+          .join(" ");
+
+        return s;
       })
       .filter(Boolean);
   }
 
+  function updateFiliereFilterOptions() {
+    if (!filterFiliereSelect) return;
+
+    const all = [];
+    studies.forEach(s => {
+      extractFilieresForStats(s.filiere || "").forEach(f => all.push(f));
+    });
+
+    const unique = Array.from(new Set(all)).sort((a, b) => a.localeCompare(b));
+    const current = filterFiliereSelect.value;
+
+    filterFiliereSelect.innerHTML = "";
+
+    const optAll = document.createElement("option");
+    optAll.value = "";
+    optAll.textContent = "Toutes les filières";
+    filterFiliereSelect.appendChild(optAll);
+
+    unique.forEach(f => {
+      const opt = document.createElement("option");
+      opt.value = f;
+      opt.textContent = f;
+      filterFiliereSelect.appendChild(opt);
+    });
+
+    if (unique.includes(current)) {
+      filterFiliereSelect.value = current;
+    } else {
+      filterFiliereSelect.value = "";
+    }
+  }
+
   function renderStats() {
     const regionCounts = buildCountMap(studies.map(s => s.regionStudy || s.region));
+
     const allFilieres = [];
     studies.forEach(s => {
-      const list = extractNormalizedFilieres(s.filiere || "");
+      const list = extractFilieresForStats(s.filiere || "");
       list.forEach(v => allFilieres.push(v));
     });
     const filiereCounts = buildCountMap(allFilieres);
+
     const instCounts = buildCountMap(studies.map(s => s.institution));
 
     renderBarChart(statsRegionChart, regionCounts);
     renderBarChart(statsFiliereChart, filiereCounts);
     renderStatsTable(statsInstitutionTableBody, instCounts);
+    updateFiliereFilterOptions();
   }
 
   // Export Excel
@@ -2234,6 +2301,12 @@
 
   if (searchInput) {
     searchInput.addEventListener("input", () => {
+      renderTable();
+    });
+  }
+
+  if (filterFiliereSelect) {
+    filterFiliereSelect.addEventListener("change", () => {
       renderTable();
     });
   }
