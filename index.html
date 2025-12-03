@@ -328,6 +328,7 @@
       font-weight: 600;
       color: #374151;
       white-space: nowrap;
+      user-select: none;
     }
 
     tbody tr:nth-child(even) {
@@ -526,6 +527,7 @@
       gap: 6px 10px;
       margin-bottom: 6px;
       font-size: 0.82rem;
+      cursor: pointer;
     }
 
     .chart-label {
@@ -627,6 +629,12 @@
 
     .dedupe-item-info {
       font-size: 0.82rem;
+    }
+
+    mark {
+      background: #fef3c7;
+      padding: 0 1px;
+      border-radius: 2px;
     }
 
     @media (max-width: 768px) {
@@ -896,11 +904,7 @@
         <span class="hint">Filtrage plein texte sur les colonnes principales.</span>
       </div>
 
-      <div style="display:flex; flex-wrap:wrap; gap:8px; align-items:center; margin-bottom:6px;">
-        <label for="filter-filiere" class="hint">Filtrer par filière :</label>
-        <select id="filter-filiere" style="min-width:160px; padding:4px 8px; font-size:0.8rem;">
-          <option value="">Toutes les filières</option>
-        </select>
+      <div style="margin-top:4px;">
         <span class="hint" id="table-count-hint">
           0 fiche(s) affichée(s) sur 0
         </span>
@@ -934,13 +938,13 @@
           <thead>
           <tr>
             <th><input type="checkbox" id="select-all" /></th>
-            <th>Titre</th>
-            <th>Institution</th>
-            <th>Auteur(s)</th>
-            <th>Année</th>
-            <th>Filière</th>
-            <th>Produit final</th>
-            <th>Région d’étude / groupe cible</th>
+            <th data-sort-key="title">Titre</th>
+            <th data-sort-key="institution">Institution</th>
+            <th data-sort-key="author">Auteur(s)</th>
+            <th data-sort-key="year">Année</th>
+            <th data-sort-key="filiere">Filière</th>
+            <th data-sort-key="product_final">Produit final</th>
+            <th data-sort-key="region_target">Région d’étude / groupe cible</th>
             <th class="col-actions">Actions</th>
           </tr>
           </thead>
@@ -960,8 +964,17 @@
         </div>
       </div>
       <p class="hint" style="margin-bottom:8px;">
-        Synthèse des produits finaux, regroupés par filière et associés aux régions d’étude. La colonne “Processus / remarques” reprend uniquement les résumés des fiches, avec accès direct aux fiches sources.
+        Synthèse des produits finaux, regroupés par filière et associés aux régions d’étude.
+        La colonne “Processus / remarques” reprend uniquement les résumés des fiches, avec accès direct aux fiches sources.
       </p>
+
+      <div style="display:flex; flex-wrap:wrap; gap:8px; align-items:center; margin-bottom:6px;">
+        <label for="products-filter-filiere" class="hint">Filtrer par filière :</label>
+        <select id="products-filter-filiere" style="min-width:160px; padding:4px 8px; font-size:0.8rem;">
+          <option value="">Toutes les filières</option>
+        </select>
+      </div>
+
       <div style="overflow-x:auto; max-height: 420px; margin-top: 6px;">
         <table>
           <thead>
@@ -990,6 +1003,7 @@
       </div>
       <p class="hint" style="margin-bottom:10px;">
         Les graphiques et tableaux se mettent à jour automatiquement en fonction des fiches enregistrées.
+        Cliquer sur une barre de région ou de filière applique automatiquement un filtre dans le tableau.
       </p>
 
       <div class="stats-block">
@@ -1151,7 +1165,7 @@
   const resetBtn = document.getElementById("reset-btn");
   const submitBtn = document.getElementById("submit-btn");
   const tableCountHint = document.getElementById("table-count-hint");
-  const filterFiliereSelect = document.getElementById("filter-filiere");
+  const productsFilterFiliereSelect = document.getElementById("products-filter-filiere");
 
   const exportExcelBtn = document.getElementById("export-excel-btn");
   const importExcelInput = document.getElementById("import-excel-input");
@@ -1215,15 +1229,54 @@
   const statsFiliereChart = document.getElementById("stats-filiere-chart");
   const statsInstitutionTableBody = document.querySelector("#stats-institution-table tbody");
 
+  // Tri tableau
+  const sortableHeaders = document.querySelectorAll('#tab-table thead th[data-sort-key]');
+  let sortKey = null;
+  let sortDir = "asc";
+
+  sortableHeaders.forEach(th => {
+    th.dataset.label = th.textContent.trim();
+    th.style.cursor = "pointer";
+    th.addEventListener("click", () => {
+      const key = th.getAttribute("data-sort-key");
+      if (sortKey === key) {
+        sortDir = sortDir === "asc" ? "desc" : "asc";
+      } else {
+        sortKey = key;
+        sortDir = "asc";
+      }
+      renderTable();
+    });
+  });
+
+  function updateSortIndicators() {
+    sortableHeaders.forEach(th => {
+      const base = th.dataset.label || th.textContent.replace(/[▲▼]\s*$/, "").trim();
+      th.textContent = base;
+      const key = th.getAttribute("data-sort-key");
+      if (sortKey === key) {
+        th.textContent = base + (sortDir === "asc" ? " ▲" : " ▼");
+      }
+    });
+  }
+
+  function switchToTab(tabName) {
+    tabButtons.forEach(b => {
+      const t = b.getAttribute("data-tab");
+      if (t === tabName) b.classList.add("active");
+      else b.classList.remove("active");
+    });
+    tabSections.forEach(s => {
+      if (s.id === "tab-" + tabName) s.classList.add("active");
+      else s.classList.remove("active");
+    });
+  }
+
   // Gestion des onglets
   tabButtons.forEach(btn => {
     btn.addEventListener("click", () => {
       const tab = btn.getAttribute("data-tab");
-      tabButtons.forEach(b => b.classList.remove("active"));
-      tabSections.forEach(s => s.classList.remove("active"));
-      btn.classList.add("active");
-      const section = document.getElementById("tab-" + tab);
-      if (section) section.classList.add("active");
+      switchToTab(tab);
     });
   });
 
@@ -1308,6 +1361,22 @@
     });
   }
 
+  function escapeRegExp(str) {
+    return str.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+  }
+
+  function highlight(text) {
+    const filter = (searchInput && searchInput.value || "").trim();
+    const safe = escapeHtml(text || "");
+    if (!filter) return safe;
+    try {
+      const pattern = new RegExp("(" + escapeRegExp(filter) + ")", "gi");
+      return safe.replace(pattern, "<mark>$1</mark>");
+    } catch (e) {
+      return safe;
+    }
+  }
+
   function buildProductsString() {
     const selected = Array.from(productCheckboxes)
       .filter(cb => cb.checked)
@@ -1379,12 +1448,7 @@
     editIndexInput.value = index;
     submitBtn.textContent = "✏️ Mettre à jour la fiche";
     window.scrollTo({ top: 0, behavior: "smooth" });
-    tabButtons.forEach(b => b.classList.remove("active"));
-    tabSections.forEach(s => s.classList.remove("active"));
-    const btnForm = document.querySelector('.tab-button[data-tab="form"]');
-    const secForm = document.getElementById("tab-form");
-    if (btnForm) btnForm.classList.add("active");
-    if (secForm) secForm.classList.add("active");
+    switchToTab("form");
   }
 
   function onDuplicate(index) {
@@ -1394,12 +1458,7 @@
     editIndexInput.value = "-1";
     submitBtn.textContent = "💾 Enregistrer la fiche";
     window.scrollTo({ top: 0, behavior: "smooth" });
-    tabButtons.forEach(b => b.classList.remove("active"));
-    tabSections.forEach(s => s.classList.remove("active"));
-    const btnForm = document.querySelector('.tab-button[data-tab="form"]');
-    const secForm = document.getElementById("tab-form");
-    if (btnForm) btnForm.classList.add("active");
-    if (secForm) secForm.classList.add("active");
+    switchToTab("form");
   }
 
   function onDelete(index) {
@@ -1539,46 +1598,70 @@
   // Tableau principal
   function renderTable() {
     if (!tbody) return;
+    updateSortIndicators();
     tbody.innerHTML = "";
     if (entryCountSpan) entryCountSpan.textContent = studies.length.toString();
     if (selectAllCheckbox) selectAllCheckbox.checked = false;
 
     const filter = (searchInput && searchInput.value || "").toLowerCase().trim();
-    const filiereFilter = filterFiliereSelect ? filterFiliereSelect.value : "";
 
     const filtered = studies.filter((s) => {
-      // filtre texte plein
-      const matchesText = (function () {
-        if (!filter) return true;
-        const text =
-          (s.title || "") + " " +
-          (s.institution || "") + " " +
-          (s.author || "") + " " +
-          (s.coauthors || "") + " " +
-          (s.domain || "") + " " +
-          (s.filiere || "") + " " +
-          (s.product_final || "") + " " +
-          (s.regionStudy || s.region || "") + " " +
-          (s.zoneStudy || "") + " " +
-          (s.regionResearcher || "") + " " +
-          (s.target || "") + " " +
-          (s.keywords || "") + " " +
-          (s.summary || "") + " " +
-          (s.products || "");
-        return text.toLowerCase().includes(filter);
-      })();
-
-      // filtre par filière (en utilisant le même découpage que les stats)
-      const matchesFiliere = (function () {
-        if (!filiereFilter) return true;
-        const list = extractFilieresForStats(s.filiere || "");
-        return list.includes(filiereFilter);
-      })();
-
-      return matchesText && matchesFiliere;
+      if (!filter) return true;
+      const text =
+        (s.title || "") + " " +
+        (s.institution || "") + " " +
+        (s.author || "") + " " +
+        (s.coauthors || "") + " " +
+        (s.domain || "") + " " +
+        (s.filiere || "") + " " +
+        (s.product_final || "") + " " +
+        (s.regionStudy || s.region || "") + " " +
+        (s.zoneStudy || "") + " " +
+        (s.regionResearcher || "") + " " +
+        (s.target || "") + " " +
+        (s.keywords || "") + " " +
+        (s.summary || "") + " " +
+        (s.products || "");
+      return text.toLowerCase().includes(filter);
     });
 
-    // Info de comptage
+    // tri
+    if (sortKey) {
+      const direction = sortDir === "asc" ? 1 : -1;
+      filtered.sort((a, b) => {
+        function getVal(s) {
+          switch (sortKey) {
+            case "title": return s.title || "";
+            case "institution": return s.institution || "";
+            case "author": return ((s.author || "") + " " + (s.coauthors || ""));
+            case "year": return s.year || "";
+            case "filiere": return s.filiere || "";
+            case "product_final": return s.product_final || "";
+            case "region_target":
+              return (s.regionStudy || s.region || "") + " " + (s.target || "");
+            default: return "";
+          }
+        }
+        let va = getVal(a).toString().toLowerCase().trim();
+        let vb = getVal(b).toString().toLowerCase().trim();
+        let cmp = 0;
+        if (sortKey === "year") {
+          const na = parseInt(va, 10);
+          const nb = parseInt(vb, 10);
+          if (!isNaN(na) && !isNaN(nb)) {
+            cmp = na - nb;
+          } else {
+            if (va < vb) cmp = -1;
+            else if (va > vb) cmp = 1;
+          }
+        } else {
+          if (va < vb) cmp = -1;
+          else if (va > vb) cmp = 1;
+        }
+        return cmp * direction;
+      });
+    }
+
     if (tableCountHint) {
       tableCountHint.textContent =
         filtered.length + " fiche(s) affichée(s) sur " + studies.length;
@@ -1608,44 +1691,50 @@
       tr.appendChild(tdSelect);
 
       const tdTitle = document.createElement("td");
-      tdTitle.innerHTML =
-        "<strong>" + escapeHtml(study.title || "Sans titre") + "</strong>" +
-        (study.summary
-          ? "<br/><span class='small-text'>" + escapeHtml(truncate(study.summary, 80)) + "</span>"
-          : "");
+      const titleHtml = highlight(study.title || "Sans titre");
+      let summaryHtml = "";
+      if (study.summary) {
+        summaryHtml =
+          "<br/><span class='small-text'>" +
+          highlight(truncate(study.summary, 80)) +
+          "</span>";
+      }
+      tdTitle.innerHTML = "<strong>" + titleHtml + "</strong>" + summaryHtml;
       tr.appendChild(tdTitle);
 
       const tdInst = document.createElement("td");
-      tdInst.textContent = study.institution || "";
+      tdInst.innerHTML = highlight(study.institution || "");
       tr.appendChild(tdInst);
 
       const tdAuthors = document.createElement("td");
-      tdAuthors.innerHTML =
-        escapeHtml(study.author || "") +
-        (study.coauthors
-          ? "<br/><span class='small-text'>" + escapeHtml(study.coauthors) + "</span>"
-          : "");
+      const mainAuthor = highlight(study.author || "");
+      let coauth = "";
+      if (study.coauthors) {
+        coauth = "<br/><span class='small-text'>" + highlight(study.coauthors) + "</span>";
+      }
+      tdAuthors.innerHTML = mainAuthor + coauth;
       tr.appendChild(tdAuthors);
 
       const tdYear = document.createElement("td");
       tdYear.className = "nowrap";
-      tdYear.textContent = study.year || "";
+      tdYear.innerHTML = highlight(study.year || "");
       tr.appendChild(tdYear);
 
       const tdFiliere = document.createElement("td");
-      tdFiliere.textContent = study.filiere || "";
+      tdFiliere.innerHTML = highlight(study.filiere || "");
       tr.appendChild(tdFiliere);
 
       const tdProdFinal = document.createElement("td");
-      tdProdFinal.textContent = study.product_final || "";
+      tdProdFinal.innerHTML = highlight(study.product_final || "");
       tr.appendChild(tdProdFinal);
 
       const tdRegionStudy = document.createElement("td");
-      tdRegionStudy.innerHTML =
-        escapeHtml(study.regionStudy || study.region || "") +
-        (study.target
-          ? "<br/><span class='small-text'>" + escapeHtml(study.target) + "</span>"
-          : "");
+      const regionText = highlight(study.regionStudy || study.region || "");
+      let targetHtml = "";
+      if (study.target) {
+        targetHtml = "<br/><span class='small-text'>" + highlight(study.target) + "</span>";
+      }
+      tdRegionStudy.innerHTML = regionText + targetHtml;
       tr.appendChild(tdRegionStudy);
 
       const tdActions = document.createElement("td");
@@ -1686,6 +1775,35 @@
   }
 
   // Produits : synthèse par filière & produit final
+  function updateProductsFiliereFilterOptions(entries) {
+    if (!productsFilterFiliereSelect) return;
+    const current = productsFilterFiliereSelect.value;
+    const set = new Set();
+    entries.forEach(e => {
+      const f = (e.filiere || "").trim();
+      if (f) set.add(f);
+    });
+
+    productsFilterFiliereSelect.innerHTML = "";
+    const optAll = document.createElement("option");
+    optAll.value = "";
+    optAll.textContent = "Toutes les filières";
+    productsFilterFiliereSelect.appendChild(optAll);
+
+    Array.from(set).sort((a, b) => a.localeCompare(b)).forEach(f => {
+      const opt = document.createElement("option");
+      opt.value = f;
+      opt.textContent = f;
+      productsFilterFiliereSelect.appendChild(opt);
+    });
+
+    if (set.has(current)) {
+      productsFilterFiliereSelect.value = current;
+    } else {
+      productsFilterFiliereSelect.value = "";
+    }
+  }
+
   function renderProductsTable() {
     if (!productsTbody) return;
     productsTbody.innerHTML = "";
@@ -1719,7 +1837,7 @@
       }
     });
 
-    const entries = Object.values(map);
+    let entries = Object.values(map);
     if (!entries.length) {
       const tr = document.createElement("tr");
       const td = document.createElement("td");
@@ -1731,6 +1849,12 @@
       return;
     }
 
+    // Met à jour la liste des filières possibles
+    updateProductsFiliereFilterOptions(entries);
+
+    const filFilter = productsFilterFiliereSelect ? productsFilterFiliereSelect.value : "";
+
+    // Tri par filière / produit pour un affichage stable
     entries.sort((a, b) => {
       const fa = (a.filiere || "").toLowerCase();
       const fb = (b.filiere || "").toLowerCase();
@@ -1743,7 +1867,23 @@
       return 0;
     });
 
-    entries.forEach(entry => {
+    const toDisplay = entries.filter(entry => {
+      if (!filFilter) return true;
+      return (entry.filiere || "").trim() === filFilter;
+    });
+
+    if (!toDisplay.length) {
+      const tr = document.createElement("tr");
+      const td = document.createElement("td");
+      td.colSpan = 5;
+      td.className = "no-data";
+      td.textContent = "Aucun produit ne correspond à ce filtre.";
+      tr.appendChild(td);
+      productsTbody.appendChild(tr);
+      return;
+    }
+
+    toDisplay.forEach(entry => {
       const tr = document.createElement("tr");
 
       const tdFil = document.createElement("td");
@@ -1840,7 +1980,7 @@
     tbodyEl.appendChild(trTotal);
   }
 
-  function renderBarChart(containerEl, countMap) {
+  function renderBarChart(containerEl, countMap, onClickLabel) {
     if (!containerEl) return;
     containerEl.innerHTML = "";
     const entries = Object.entries(countMap).sort((a, b) => b[1] - a[1]);
@@ -1878,83 +2018,56 @@
       row.appendChild(labelDiv);
       row.appendChild(barWrapper);
 
+      if (typeof onClickLabel === "function") {
+        row.addEventListener("click", () => {
+          onClickLabel(label);
+        });
+      }
+
       containerEl.appendChild(row);
     });
   }
 
-  // Découpage des filières pour les stats et le filtre
- function extractFilieresForStats(str) {
-  if (!str) return [];
-  return str
-    // on coupe sur ; , ou /
-    .split(/[;,/]/)
-    .map(part => {
-      let s = part.trim();
-      if (!s) return "";
+  // Découpage des filières pour les stats
+  function extractFilieresForStats(str) {
+    if (!str) return [];
+    return str
+      .split(/[;,/]/)
+      .map(part => {
+        let s = part.trim();
+        if (!s) return "";
 
-      // retirer "etc." ou "etc"
-      s = s.replace(/\betc\.?\b/gi, "");
+        // retirer "etc." ou "etc"
+        s = s.replace(/\betc\.?\b/gi, "");
 
-      // retirer le texte entre parenthèses
-      s = s.replace(/\(.*?\)/g, "");
+        // retirer le texte entre parenthèses
+        s = s.replace(/\(.*?\)/g, "");
 
-      // retirer toutes parenthèses restantes au cas où
-      s = s.replace(/[()]/g, "");
+        // retirer toutes parenthèses restantes
+        s = s.replace(/[()]/g, "");
 
-      // nettoyer ponctuation et tirets au début/à la fin
-      s = s.replace(/^[\s\-–—:,.]+/, "");
-      s = s.replace(/[\s\-–—:,.]+$/, "");
+        // nettoyer ponctuation et tirets au début/à la fin
+        s = s.replace(/^[\s\-–—:,.]+/, "");
+        s = s.replace(/[\s\-–—:,.]+$/, "");
 
-      s = s.trim();
-      if (!s) return "";
+        s = s.trim();
+        if (!s) return "";
 
-      // compresser les espaces multiples
-      s = s.replace(/\s+/g, " ");
+        // compresser les espaces multiples
+        s = s.replace(/\s+/g, " ");
 
-      // Normaliser les majuscules : première lettre de chaque mot
-      s = s
-        .split(" ")
-        .map(w => {
-          if (!w) return "";
-          return w.charAt(0).toUpperCase() + w.slice(1).toLowerCase();
-        })
-        .join(" ");
+        // Normaliser les majuscules : première lettre de chaque mot
+        s = s
+          .split(" ")
+          .map(w => {
+            if (!w) return "";
+            return w.charAt(0).toUpperCase() + w.slice(1).toLowerCase();
+          })
+          .join(" ");
 
-      return s;
-    })
-    .filter(Boolean);
-}
-
-  function updateFiliereFilterOptions() {
-    if (!filterFiliereSelect) return;
-
-    const all = [];
-    studies.forEach(s => {
-      extractFilieresForStats(s.filiere || "").forEach(f => all.push(f));
-    });
-
-    const unique = Array.from(new Set(all)).sort((a, b) => a.localeCompare(b));
-    const current = filterFiliereSelect.value;
-
-    filterFiliereSelect.innerHTML = "";
-
-    const optAll = document.createElement("option");
-    optAll.value = "";
-    optAll.textContent = "Toutes les filières";
-    filterFiliereSelect.appendChild(optAll);
-
-    unique.forEach(f => {
-      const opt = document.createElement("option");
-      opt.value = f;
-      opt.textContent = f;
-      filterFiliereSelect.appendChild(opt);
-    });
-
-    if (unique.includes(current)) {
-      filterFiliereSelect.value = current;
-    } else {
-      filterFiliereSelect.value = "";
-    }
+        return s;
+      })
+      .filter(Boolean);
   }
 
   function renderStats() {
@@ -1969,10 +2082,25 @@
 
     const instCounts = buildCountMap(studies.map(s => s.institution));
 
-    renderBarChart(statsRegionChart, regionCounts);
-    renderBarChart(statsFiliereChart, filiereCounts);
+    // Interaction : clic sur région -> filtre texte + onglet tableau
+    renderBarChart(statsRegionChart, regionCounts, (label) => {
+      if (searchInput) {
+        searchInput.value = label;
+        renderTable();
+        switchToTab("table");
+      }
+    });
+
+    // Interaction : clic sur filière -> filtre texte + onglet tableau
+    renderBarChart(statsFiliereChart, filiereCounts, (label) => {
+      if (searchInput) {
+        searchInput.value = label;
+        renderTable();
+        switchToTab("table");
+      }
+    });
+
     renderStatsTable(statsInstitutionTableBody, instCounts);
-    updateFiliereFilterOptions();
   }
 
   // Export Excel
@@ -2319,9 +2447,9 @@
     });
   }
 
-  if (filterFiliereSelect) {
-    filterFiliereSelect.addEventListener("change", () => {
-      renderTable();
+  if (productsFilterFiliereSelect) {
+    productsFilterFiliereSelect.addEventListener("change", () => {
+      renderProductsTable();
     });
   }
 
