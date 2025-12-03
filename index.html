@@ -1013,7 +1013,7 @@
         </div>
         <div class="stats-meta">
           <span class="stats-badge">Graphique horizontal</span>
-          <span>Basé sur la région d’étude (et non la région du chercheur).</span>
+          <span>Basé sur la région d’étude (et non la région du chercheur). Les combinaisons sont éclatées par région officielle.</span>
         </div>
         <div id="stats-region-chart" class="chart-block"></div>
       </div>
@@ -1154,6 +1154,33 @@
   const STORAGE_KEY = "nutritionStudiesMG";
 
   let studies = [];
+
+  // Liste officielle des régions de Madagascar pour les stats
+  const MG_REGIONS = [
+    "Analamanga",
+    "Vakinankaratra",
+    "Itasy",
+    "Bongolava",
+    "Alaotra-Mangoro",
+    "Atsinanana",
+    "Analanjirofo",
+    "Atsimo-Atsinanana",
+    "Vatovavy",
+    "Fitovinany",
+    "Menabe",
+    "Atsimo-Andrefana",
+    "Androy",
+    "Anosy",
+    "Ihorombe",
+    "Haute Matsiatra",
+    "Amoron'i Mania",
+    "Betsiboka",
+    "Boeny",
+    "Sofia",
+    "Melaky",
+    "DIANA",
+    "SAVA"
+  ];
 
   // éléments principaux
   const form = document.getElementById("study-form");
@@ -2070,9 +2097,31 @@
       .filter(Boolean);
   }
 
-  function renderStats() {
-    const regionCounts = buildCountMap(studies.map(s => s.regionStudy || s.region));
+  // Découpage des régions pour les stats : chaque région officielle comptée individuellement
+  function extractRegionsForStats(str) {
+    const text = (str || "").toLowerCase();
+    if (!text) return [];
+    const found = new Set();
+    MG_REGIONS.forEach(region => {
+      const rl = region.toLowerCase();
+      if (text.includes(rl)) {
+        found.add(region);
+      }
+    });
+    return Array.from(found);
+  }
 
+  function renderStats() {
+    // Régions : éclatement des combinaisons et comptage par région officielle
+    const allRegions = [];
+    studies.forEach(s => {
+      const label = s.regionStudy || s.region || "";
+      const regions = extractRegionsForStats(label);
+      regions.forEach(r => allRegions.push(r));
+    });
+    const regionCounts = buildCountMap(allRegions);
+
+    // Filières
     const allFilieres = [];
     studies.forEach(s => {
       const list = extractFilieresForStats(s.filiere || "");
