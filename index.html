@@ -433,6 +433,13 @@
       font-size: 1.1rem;
     }
 
+    .modal-actions {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
     .modal-close {
       border-radius: 999px;
       border: none;
@@ -1054,10 +1061,16 @@
         <span class="icon">🔍</span>
         <span id="detail-title">Détails de la fiche</span>
       </div>
-      <button class="modal-close" id="detail-close-btn">
-        <span class="icon">✖</span>
-        <span>Fermer</span>
-      </button>
+      <div class="modal-actions">
+        <button class="modal-close" id="detail-edit-btn">
+          <span class="icon">✏️</span>
+          <span>Éditer</span>
+        </button>
+        <button class="modal-close" id="detail-close-btn">
+          <span class="icon">✖</span>
+          <span>Fermer</span>
+        </button>
+      </div>
     </div>
     <div class="modal-body">
       <div class="detail-grid" id="detail-grid">
@@ -1082,7 +1095,7 @@
     </div>
     <div class="modal-body">
       <p class="hint" style="margin-bottom:8px;">
-        Chaque ligne correspond à une fiche de recherche qui mentionne ce produit. Le bouton “Voir la fiche” ouvre le détail complet.
+        Chaque ligne correspond à une fiche de recherche qui mentionne ce produit. Les boutons permettent de consulter ou d’éditer directement la fiche.
       </p>
       <div id="product-sources-list"></div>
     </div>
@@ -1234,6 +1247,8 @@
   const detailGrid = document.getElementById("detail-grid");
   const detailTitle = document.getElementById("detail-title");
   const detailCloseBtn = document.getElementById("detail-close-btn");
+  const detailEditBtn = document.getElementById("detail-edit-btn");
+  let currentDetailIndex = null;
 
   // Modal fiches sources produits
   const productSourcesModal = document.getElementById("product-sources-modal");
@@ -1505,6 +1520,7 @@
   function openDetailModal(index) {
     const study = studies[index];
     if (!study) return;
+    currentDetailIndex = index;
     detailTitle.textContent = study.title || "Détails de la fiche";
 
     const rows = [
@@ -1550,12 +1566,21 @@
 
   function closeDetailModal() {
     detailModal.classList.remove("show");
+    currentDetailIndex = null;
   }
 
   if (detailCloseBtn && detailModal) {
     detailCloseBtn.addEventListener("click", closeDetailModal);
     detailModal.addEventListener("click", (e) => {
       if (e.target === detailModal) closeDetailModal();
+    });
+  }
+
+  if (detailEditBtn) {
+    detailEditBtn.addEventListener("click", () => {
+      if (currentDetailIndex === null) return;
+      onEdit(currentDetailIndex);
+      closeDetailModal();
     });
   }
 
@@ -1592,17 +1617,34 @@
         (s.year ? " • " + escapeHtml(String(s.year)) : "") +
         "</span>";
 
-      const btn = document.createElement("button");
-      btn.type = "button";
-      btn.className = "btn-chip btn-chip-info";
-      btn.innerHTML = '<span class="icon">🔍</span><span>Voir la fiche</span>';
-      btn.addEventListener("click", (e) => {
+      const actions = document.createElement("div");
+      actions.style.display = "flex";
+      actions.style.flexWrap = "wrap";
+      actions.style.gap = "4px";
+
+      const btnView = document.createElement("button");
+      btnView.type = "button";
+      btnView.className = "btn-chip btn-chip-info";
+      btnView.innerHTML = '<span class="icon">🔍</span><span>Voir la fiche</span>';
+      btnView.addEventListener("click", (e) => {
         e.preventDefault();
         openDetailModal(idx);
       });
 
+      const btnEdit = document.createElement("button");
+      btnEdit.type = "button";
+      btnEdit.className = "btn-chip btn-chip-edit";
+      btnEdit.innerHTML = '<span class="icon">✏️</span><span>Éditer</span>';
+      btnEdit.addEventListener("click", (e) => {
+        e.preventDefault();
+        onEdit(idx);
+      });
+
+      actions.appendChild(btnView);
+      actions.appendChild(btnEdit);
+
       item.appendChild(main);
-      item.appendChild(btn);
+      item.appendChild(actions);
       productSourcesList.appendChild(item);
     });
 
