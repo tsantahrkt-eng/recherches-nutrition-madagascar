@@ -2,2587 +2,1450 @@
 <html lang="fr">
 <head>
   <meta charset="UTF-8" />
-  <title>Inventaire des recherches en nutrition à Madagascar</title>
+  <title>MIKASA Nutrition — Inventaire des recherches</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <style>
     :root {
-      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      --bg: #f5f7f4;
+      --surface: #ffffff;
+      --surface-soft: #f8faf8;
+      --text: #102016;
+      --muted: #617068;
+      --line: #dfe7e1;
+      --green-900: #16422c;
+      --green-800: #22543d;
+      --green-700: #2f855a;
+      --green-100: #def7ec;
+      --green-50: #effaf3;
+      --amber-100: #fef3c7;
+      --amber-800: #92400e;
+      --blue-100: #dbeafe;
+      --blue-800: #1e40af;
+      --red-100: #fee2e2;
+      --red-800: #991b1b;
+      --shadow: 0 14px 35px rgba(16, 32, 22, 0.09);
+      --radius-xl: 22px;
+      --radius-lg: 16px;
+      --radius-md: 12px;
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
     }
+
+    * { box-sizing: border-box; }
 
     body {
       margin: 0;
-      padding: 0;
-      background: #f3f4f6;
-      color: #111827;
+      background:
+        radial-gradient(circle at top left, rgba(47, 133, 90, .16), transparent 32rem),
+        linear-gradient(180deg, #f7faf7 0%, var(--bg) 58%, #eef4ef 100%);
+      color: var(--text);
     }
 
-    .app-container {
-      max-width: 1150px;
+    a { color: inherit; }
+
+    .app {
+      width: min(1260px, calc(100% - 28px));
       margin: 0 auto;
-      padding: 24px 16px 40px;
+      padding: 22px 0 38px;
+    }
+
+    .hero {
+      background: linear-gradient(135deg, var(--green-900), #1f6b46 62%, #38a169);
+      color: white;
+      border-radius: 28px;
+      padding: 26px;
+      box-shadow: var(--shadow);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .hero::after {
+      content: "";
+      position: absolute;
+      right: -120px;
+      top: -120px;
+      width: 360px;
+      height: 360px;
+      border-radius: 50%;
+      background: rgba(255,255,255,.12);
+    }
+
+    .hero-content { position: relative; z-index: 1; }
+
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 12px;
+      border-radius: 999px;
+      background: rgba(255,255,255,.16);
+      border: 1px solid rgba(255,255,255,.24);
+      font-size: .82rem;
+      letter-spacing: .02em;
+      margin-bottom: 12px;
     }
 
     h1 {
-      font-size: 1.8rem;
-      margin-bottom: 4px;
-      color: #22543d;
+      font-size: clamp(1.7rem, 4vw, 3rem);
+      line-height: 1.03;
+      margin: 0 0 10px;
+      max-width: 880px;
     }
 
     .subtitle {
-      font-size: 0.95rem;
-      color: #4b5563;
-      margin-bottom: 16px;
+      margin: 0;
+      max-width: 900px;
+      font-size: 1rem;
+      color: rgba(255,255,255,.86);
     }
 
-    /* Onglets */
-    .tabs {
-      display: flex;
-      gap: 8px;
-      margin-bottom: 18px;
-      border-bottom: 1px solid #e5e7eb;
-      flex-wrap: wrap;
-    }
-
-    .tab-button {
-      border: none;
-      background: transparent;
-      padding: 8px 14px;
-      font-size: 0.9rem;
-      cursor: pointer;
-      border-radius: 999px 999px 0 0;
-      color: #4b5563;
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      letter-spacing: 0.01em;
-    }
-
-    .tab-button.active {
-      background: #ffffff;
-      color: #22543d;
-      border: 1px solid #e5e7eb;
-      border-bottom-color: #ffffff;
-      font-weight: 600;
-    }
-
-    .tab-section {
-      display: none;
-    }
-
-    .tab-section.active {
-      display: block;
-    }
-
-    .card {
-      background: #ffffff;
-      border-radius: 12px;
-      padding: 16px 18px;
-      margin-bottom: 18px;
-      border-left: 5px solid #2f855a;
-      box-shadow: 0 4px 10px rgba(0,0,0,0.05);
-    }
-
-    .card-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      gap: 12px;
-      margin-bottom: 10px;
-      flex-wrap: wrap;
-    }
-
-    .card-title {
-      font-weight: 600;
-      font-size: 1.05rem;
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-    }
-
-    .card-title .dot {
-      width: 8px;
-      height: 8px;
-      border-radius: 999px;
-      background: #16a34a;
-    }
-
-    .badge {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      padding: 4px 10px;
-      border-radius: 999px;
-      font-size: 0.8rem;
-      background: #def7ec;
-      color: #276749;
-    }
-
-    .badge span {
-      font-weight: 600;
-    }
-
-    form {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-      gap: 10px 14px;
-    }
-
-    .field {
-      display: flex;
-      flex-direction: column;
-      gap: 4px;
-      font-size: 0.88rem;
-    }
-
-    label {
-      font-weight: 600;
-      color: #374151;
-    }
-
-    input[type="text"],
-    input[type="email"],
-    input[type="tel"],
-    input[type="url"],
-    input[type="number"],
-    select,
-    textarea {
-      border-radius: 8px;
-      border: 1px solid #d1d5db;
-      padding: 7px 9px;
-      font-size: 0.9rem;
-      font-family: inherit;
-      outline: none;
-      transition: border-color 0.15s, box-shadow 0.15s, background 0.15s;
-      background: #f9fafb;
-    }
-
-    input:focus,
-    select:focus,
-    textarea:focus {
-      border-color: #6366f1;
-      box-shadow: 0 0 0 1px rgba(99, 102, 241, 0.2);
-      background: #ffffff;
-    }
-
-    textarea {
-      min-height: 70px;
-      resize: vertical;
-    }
-
-    .full-width {
-      grid-column: 1 / -1;
-    }
-
-    .actions-row {
+    .hero-actions {
       display: flex;
       flex-wrap: wrap;
       gap: 10px;
-      justify-content: flex-end;
-      margin-top: 6px;
+      margin-top: 18px;
+      align-items: center;
     }
 
-    button {
+    .btn, .file-label, select, input[type="search"] {
+      font-family: inherit;
+    }
+
+    .btn, .file-label {
+      border: 0;
       border-radius: 999px;
-      border: none;
-      padding: 7px 14px;
-      font-size: 0.88rem;
-      font-weight: 500;
+      padding: 9px 15px;
+      font-size: .9rem;
+      font-weight: 650;
       cursor: pointer;
       display: inline-flex;
       align-items: center;
-      gap: 6px;
+      gap: 8px;
+      transition: transform .12s ease, box-shadow .12s ease, background .12s ease;
+      text-decoration: none;
     }
 
-    .btn-primary {
-      background: linear-gradient(135deg, #16a34a, #15803d);
-      color: #ffffff;
-      transition: transform 0.1s ease, box-shadow 0.1s ease, filter 0.1s ease;
-      box-shadow: 0 2px 6px rgba(22, 163, 74, 0.25);
-    }
+    .btn:hover, .file-label:hover { transform: translateY(-1px); }
 
-    .btn-primary:hover {
-      filter: brightness(1.05);
-      transform: translateY(-1px);
-      box-shadow: 0 4px 10px rgba(22, 163, 74, 0.3);
+    .btn-primary, .file-label {
+      background: white;
+      color: var(--green-900);
+      box-shadow: 0 10px 20px rgba(0,0,0,.14);
     }
 
     .btn-secondary {
-      background: #e5e7eb;
-      color: #111827;
-      transition: background 0.15s ease, transform 0.1s ease;
+      background: rgba(255,255,255,.14);
+      color: white;
+      border: 1px solid rgba(255,255,255,.22);
     }
 
-    .btn-secondary:hover {
-      background: #d1d5db;
-      transform: translateY(-1px);
+    .btn-quiet {
+      background: var(--green-50);
+      color: var(--green-800);
+      border: 1px solid var(--line);
+      box-shadow: none;
     }
 
-    .btn-small {
-      padding: 4px 8px;
-      font-size: 0.78rem;
+    .btn-danger {
+      background: var(--red-100);
+      color: var(--red-800);
+      box-shadow: none;
     }
 
-    /* Boutons "chips" pour les actions du tableau */
-    .btn-chip {
+    .hidden-file { display: none; }
+
+    .status-line {
+      margin-top: 12px;
+      color: rgba(255,255,255,.78);
+      font-size: .86rem;
+    }
+
+    .layout {
+      display: grid;
+      grid-template-columns: 290px minmax(0, 1fr);
+      gap: 18px;
+      margin-top: 18px;
+      align-items: start;
+    }
+
+    .panel {
+      background: rgba(255,255,255,.82);
+      border: 1px solid rgba(223, 231, 225, .9);
+      border-radius: var(--radius-xl);
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(8px);
+    }
+
+    .filters {
+      position: sticky;
+      top: 14px;
+      padding: 16px;
+    }
+
+    .panel-title {
+      font-weight: 800;
+      margin: 0 0 10px;
+      color: var(--green-900);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .field { margin-bottom: 12px; }
+
+    .field label {
+      display: block;
+      color: var(--muted);
+      font-size: .78rem;
+      font-weight: 750;
+      margin-bottom: 5px;
+      text-transform: uppercase;
+      letter-spacing: .035em;
+    }
+
+    input[type="search"], select {
+      width: 100%;
+      border: 1px solid var(--line);
+      background: white;
+      color: var(--text);
+      border-radius: 13px;
+      padding: 10px 11px;
+      outline: none;
+      font-size: .92rem;
+    }
+
+    input[type="search"]:focus, select:focus {
+      border-color: #38a169;
+      box-shadow: 0 0 0 3px rgba(56,161,105,.14);
+    }
+
+    .mini-note {
+      color: var(--muted);
+      font-size: .82rem;
+      line-height: 1.45;
+      margin: 10px 0 0;
+    }
+
+    .main { min-width: 0; }
+
+    .kpis {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 12px;
+      margin-bottom: 14px;
+    }
+
+    .kpi {
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: var(--radius-lg);
+      padding: 14px;
+      box-shadow: 0 8px 22px rgba(16, 32, 22, .05);
+    }
+
+    .kpi-value {
+      font-size: 1.6rem;
+      line-height: 1;
+      font-weight: 900;
+      color: var(--green-900);
+      margin-bottom: 5px;
+    }
+
+    .kpi-label {
+      color: var(--muted);
+      font-size: .82rem;
+      line-height: 1.25;
+    }
+
+    .tabs {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-bottom: 12px;
+    }
+
+    .tab {
+      border: 1px solid var(--line);
+      background: var(--surface);
+      color: var(--muted);
       border-radius: 999px;
-      border: 1px solid transparent;
-      padding: 3px 9px;
-      font-size: 0.76rem;
+      padding: 8px 13px;
+      cursor: pointer;
+      font-weight: 750;
+    }
+
+    .tab.active {
+      background: var(--green-800);
+      border-color: var(--green-800);
+      color: white;
+    }
+
+    .toolbar {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      align-items: center;
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: var(--radius-lg);
+      padding: 12px 14px;
+      margin-bottom: 12px;
+    }
+
+    .results-count {
+      color: var(--muted);
+      font-size: .88rem;
+    }
+
+    .view { display: none; }
+    .view.active { display: block; }
+
+    .cards {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 14px;
+    }
+
+    .study-card {
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: var(--radius-xl);
+      padding: 16px;
+      box-shadow: 0 10px 26px rgba(16, 32, 22, .06);
+      display: flex;
+      flex-direction: column;
+      gap: 11px;
+      min-height: 252px;
+    }
+
+    .study-card:hover { border-color: rgba(47,133,90,.38); }
+
+    .card-topline {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+
+    .chip {
       display: inline-flex;
       align-items: center;
-      gap: 4px;
-      cursor: pointer;
-      background: #f3f4f6;
-      color: #111827;
-      margin: 0 2px 4px 0;
-      transition: background 0.15s ease, border-color 0.15s ease, transform 0.1s ease;
+      gap: 5px;
+      border-radius: 999px;
+      padding: 4px 9px;
+      font-size: .74rem;
+      font-weight: 750;
+      border: 1px solid transparent;
+      max-width: 100%;
     }
 
-    .btn-chip span.icon {
-      font-size: 0.85rem;
+    .chip-green { background: var(--green-100); color: var(--green-800); }
+    .chip-blue { background: var(--blue-100); color: var(--blue-800); }
+    .chip-amber { background: var(--amber-100); color: var(--amber-800); }
+    .chip-red { background: var(--red-100); color: var(--red-800); }
+    .chip-neutral { background: #eef2f0; color: #44524a; }
+
+    .study-title {
+      margin: 0;
+      font-size: 1.05rem;
+      line-height: 1.25;
+      color: var(--green-900);
     }
 
-    .btn-chip:hover {
-      background: #e5e7eb;
-      transform: translateY(-0.5px);
+    .meta {
+      color: var(--muted);
+      font-size: .84rem;
+      line-height: 1.38;
     }
 
-    .btn-chip-info {
-      background: #eff6ff;
-      color: #1d4ed8;
-      border-color: #bfdbfe;
+    .summary {
+      color: #2c3d32;
+      font-size: .88rem;
+      line-height: 1.45;
+      margin: 0;
     }
 
-    .btn-chip-info:hover {
-      background: #dbeafe;
-    }
-
-    .btn-chip-edit {
-      background: #ecfdf3;
-      color: #15803d;
-      border-color: #bbf7d0;
-    }
-
-    .btn-chip-edit:hover {
-      background: #dcfce7;
-    }
-
-    .btn-chip-neutral {
-      background: #f9fafb;
-      color: #374151;
-      border-color: #e5e7eb;
-    }
-
-    .btn-chip-danger {
-      background: #fef2f2;
-      color: #b91c1c;
-      border-color: #fecaca;
-    }
-
-    .btn-chip-danger:hover {
-      background: #fee2e2;
-    }
-
-    #search-bar-container {
+    .card-footer {
+      margin-top: auto;
       display: flex;
-      flex-wrap: wrap;
-      gap: 10px;
+      gap: 8px;
+      justify-content: space-between;
       align-items: center;
-      margin-bottom: 4px;
+      flex-wrap: wrap;
     }
 
-    #search-input {
-      flex: 1;
-      min-width: 200px;
+    .small-btn {
+      border: 0;
+      border-radius: 999px;
+      padding: 7px 11px;
+      font-size: .8rem;
+      font-weight: 800;
+      cursor: pointer;
+      background: var(--green-50);
+      color: var(--green-800);
+      border: 1px solid var(--line);
     }
 
-    .hint {
-      font-size: 0.8rem;
-      color: #6b7280;
+    .table-wrap {
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: var(--radius-xl);
+      overflow: hidden;
+      box-shadow: 0 10px 26px rgba(16, 32, 22, .06);
     }
 
     table {
       width: 100%;
       border-collapse: collapse;
-      font-size: 0.82rem;
-      margin-top: 8px;
-      font-family: Verdana, Geneva, sans-serif;
+      font-size: .85rem;
     }
 
-    thead {
-      background: #f9fafb;
+    th, td {
+      padding: 10px 11px;
+      text-align: left;
+      vertical-align: top;
+      border-bottom: 1px solid var(--line);
+    }
+
+    th {
+      background: var(--green-50);
+      color: var(--green-900);
+      font-size: .77rem;
+      text-transform: uppercase;
+      letter-spacing: .035em;
       position: sticky;
       top: 0;
       z-index: 1;
     }
 
-    th,
-    td {
-      padding: 8px 6px;
-      border-bottom: 1px solid #e5e7eb;
-      vertical-align: top;
-      text-align: left;
-    }
+    tbody tr:hover { background: #fbfdfb; }
 
-    th {
-      font-weight: 600;
-      color: #374151;
+    .truncate-cell {
+      max-width: 320px;
       white-space: nowrap;
-      user-select: none;
+      overflow: hidden;
+      text-overflow: ellipsis;
     }
 
-    tbody tr:nth-child(even) {
-      background: #f9fafb;
+    .insights-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 14px;
     }
 
-    tbody tr:hover {
-      background: #eef2ff;
+    .insight-card {
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: var(--radius-xl);
+      padding: 16px;
+      box-shadow: 0 10px 26px rgba(16, 32, 22, .06);
     }
 
-    .col-actions {
-      white-space: nowrap;
-    }
-
-    .small-text {
-      font-size: 0.8rem;
-      color: #4b5563;
-    }
-
-    .nowrap {
-      white-space: nowrap;
-    }
-
-    .pill {
-      display: inline-block;
-      padding: 2px 8px;
-      border-radius: 999px;
-      font-size: 0.72rem;
-      background: #ecfdf3;
-      color: #166534;
-    }
-
-    .no-data {
-      font-size: 0.86rem;
-      color: #6b7280;
-      text-align: center;
-      padding: 12px 0;
-    }
-
-    .products-group {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 6px 16px;
-      margin-bottom: 6px;
-    }
-
-    .checkbox-inline {
-      display: flex;
+    .bar-row {
+      display: grid;
+      grid-template-columns: minmax(120px, 210px) minmax(90px, 1fr) 38px;
+      gap: 8px;
       align-items: center;
-      gap: 4px;
-      font-size: 0.85rem;
+      margin: 9px 0;
+      cursor: pointer;
     }
 
-    /* Modal générique */
+    .bar-label {
+      font-size: .84rem;
+      color: #2c3d32;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .bar-track {
+      height: 11px;
+      background: #e6eee8;
+      border-radius: 999px;
+      overflow: hidden;
+    }
+
+    .bar-fill {
+      height: 100%;
+      background: linear-gradient(90deg, #38a169, #68d391);
+      border-radius: inherit;
+    }
+
+    .bar-count {
+      font-size: .8rem;
+      color: var(--muted);
+      text-align: right;
+      font-weight: 800;
+    }
+
+    .empty {
+      padding: 28px;
+      text-align: center;
+      color: var(--muted);
+      background: var(--surface);
+      border: 1px dashed var(--line);
+      border-radius: var(--radius-xl);
+    }
+
+    .recommendations {
+      padding: 16px;
+    }
+
+    .columns-list {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 10px;
+      margin-top: 12px;
+    }
+
+    .column-item {
+      background: var(--surface-soft);
+      border: 1px solid var(--line);
+      border-radius: 13px;
+      padding: 10px;
+    }
+
+    .column-name {
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      font-size: .82rem;
+      font-weight: 800;
+      color: var(--green-900);
+    }
+
+    .column-desc {
+      color: var(--muted);
+      font-size: .8rem;
+      line-height: 1.35;
+      margin-top: 3px;
+    }
+
     .modal-backdrop {
       position: fixed;
       inset: 0;
-      background: rgba(15,23,42,0.45);
+      background: rgba(7, 21, 13, .56);
+      z-index: 50;
       display: none;
       align-items: center;
       justify-content: center;
-      z-index: 50;
+      padding: 18px;
     }
 
-    .modal-backdrop.show {
-      display: flex;
-    }
+    .modal-backdrop.show { display: flex; }
 
-    .modal-content {
-      background: #ffffff;
-      border-radius: 16px;
-      max-width: 820px;
-      width: 100%;
-      max-height: 80vh;
-      overflow-y: auto;
-      padding: 0;
-      box-shadow: 0 20px 40px rgba(15,23,42,0.35);
-      border-top: 5px solid #16a34a;
+    .modal {
+      width: min(980px, 100%);
+      max-height: min(86vh, 820px);
+      overflow: auto;
+      background: var(--surface);
+      border-radius: 26px;
+      box-shadow: 0 30px 70px rgba(0,0,0,.28);
+      border: 1px solid var(--line);
     }
 
     .modal-header {
+      position: sticky;
+      top: 0;
+      background: linear-gradient(135deg, #f8fff9, #effaf3);
+      border-bottom: 1px solid var(--line);
+      padding: 18px 20px;
+      z-index: 2;
       display: flex;
       justify-content: space-between;
-      align-items: center;
-      gap: 12px;
-      padding: 14px 18px;
-      background: linear-gradient(135deg, #ecfdf3, #f0fdf4);
-      border-bottom: 1px solid #e5e7eb;
-      border-radius: 16px 16px 0 0;
-      flex-wrap: wrap;
+      gap: 16px;
+      align-items: flex-start;
     }
 
     .modal-title {
-      font-weight: 600;
-      font-size: 1rem;
-      display: flex;
-      align-items: center;
-      gap: 8px;
+      margin: 0;
+      color: var(--green-900);
+      font-size: 1.15rem;
+      line-height: 1.25;
     }
 
-    .modal-title .icon {
-      font-size: 1.1rem;
-    }
-
-    .modal-actions {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      flex-wrap: wrap;
-    }
-
-    .modal-close {
+    .close {
+      border: 0;
       border-radius: 999px;
-      border: none;
-      background: #e5e7eb;
+      background: white;
+      color: var(--green-900);
+      border: 1px solid var(--line);
       cursor: pointer;
-      font-size: 0.8rem;
-      padding: 4px 10px;
-      display: inline-flex;
-      align-items: center;
-      gap: 4px;
+      font-weight: 900;
+      padding: 7px 11px;
     }
 
-    .modal-close span.icon {
-      font-size: 0.9rem;
+    .modal-body { padding: 18px 20px 24px; }
+
+    .detail-section {
+      border: 1px solid var(--line);
+      border-radius: var(--radius-lg);
+      margin-bottom: 14px;
+      overflow: hidden;
     }
 
-    .modal-body {
-      padding: 14px 18px 16px;
+    .detail-section h3 {
+      margin: 0;
+      padding: 10px 12px;
+      background: var(--green-50);
+      color: var(--green-900);
+      font-size: .9rem;
     }
 
     .detail-grid {
       display: grid;
-      grid-template-columns: minmax(150px, 220px) 1fr;
-      gap: 6px 12px;
-      font-size: 0.85rem;
+      grid-template-columns: 230px minmax(0, 1fr);
+    }
+
+    .detail-label, .detail-value {
+      border-top: 1px solid var(--line);
+      padding: 9px 12px;
+      font-size: .88rem;
+      line-height: 1.45;
     }
 
     .detail-label {
-      font-weight: 600;
-      color: #374151;
-      background: #f9fafb;
-      border-radius: 6px;
-      padding: 4px 6px;
+      color: var(--muted);
+      background: #fbfdfb;
+      font-weight: 800;
     }
 
-    .detail-value {
-      color: #111827;
-      padding: 4px 2px;
-    }
+    .detail-value { white-space: pre-wrap; }
 
-    /* Stats */
-    .stats-block {
-      margin-bottom: 16px;
-    }
-
-    .stats-title {
-      font-size: 0.92rem;
-      font-weight: 600;
-      margin-bottom: 4px;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-
-    .stats-title .dot {
-      width: 6px;
-      height: 6px;
-      border-radius: 999px;
-      background: #4ade80;
-    }
-
-    .stats-meta {
-      font-size: 0.78rem;
-      color: #6b7280;
-      display: flex;
-      align-items: center;
-      gap: 6px;
-    }
-
-    .stats-badge {
-      border-radius: 999px;
-      padding: 2px 8px;
-      font-size: 0.75rem;
-      background: #eef2ff;
-      color: #3730a3;
-    }
-
-    .chart-block {
-      margin-top: 6px;
-      border-radius: 10px;
-      background: #f9fafb;
-      padding: 8px 10px;
-      max-height: 320px;
-      overflow-y: auto;
-      border: 1px solid #e5e7eb;
-    }
-
-    .chart-row {
-      display: grid;
-      grid-template-columns: minmax(120px, 170px) 1fr;
-      align-items: center;
-      gap: 6px 10px;
-      margin-bottom: 6px;
-      font-size: 0.82rem;
-      cursor: pointer;
-    }
-
-    .chart-label {
-      color: #374151;
-      font-weight: 500;
-    }
-
-    .chart-bar-wrapper {
-      position: relative;
-      background: #e5e7eb;
-      border-radius: 999px;
-      height: 16px;
-      overflow: hidden;
-    }
-
-    .chart-bar {
-      height: 100%;
-      border-radius: 999px;
-      background: linear-gradient(90deg, #34d399, #22c55e);
-      min-width: 4%;
-      transition: width 0.2s ease-out;
-    }
-
-    .chart-value {
-      position: absolute;
-      right: 6px;
-      top: 50%;
-      transform: translateY(-50%);
-      font-size: 0.78rem;
-      color: #111827;
-    }
-
-    /* Styles Produits */
-    #tab-products table tbody tr:hover {
-      background: #f3f4ff;
-    }
-
-    #tab-products td:nth-child(1),
-    #tab-products td:nth-child(2) {
-      font-weight: 500;
-      color: #111827;
-    }
-
-    #tab-products td:nth-child(3) {
-      font-size: 0.78rem;
-      color: #4b5563;
-    }
-
-    #tab-products td:nth-child(4) {
-      font-size: 0.8rem;
-    }
-
-    /* Produits : modal fiches sources */
-    .product-source-item {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 8px;
-      padding: 6px 0;
-      border-bottom: 1px dashed #e5e7eb;
-      flex-wrap: wrap;
-    }
-
-    .product-source-main {
-      flex: 1;
-      min-width: 220px;
-    }
-
-    /* Dédoublonnage */
-    .dedupe-group {
-      border: 1px solid #e5e7eb;
-      border-radius: 8px;
-      padding: 8px 10px;
-      margin-bottom: 10px;
-      background: #f9fafb;
-    }
-
-    .dedupe-group-title {
-      font-weight: 600;
-      font-size: 0.9rem;
-      margin-bottom: 6px;
-      color: #111827;
-    }
-
-    .dedupe-item {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      padding: 4px 0;
-      border-top: 1px dashed #e5e7eb;
-      margin-top: 4px;
-      flex-wrap: wrap;
-    }
-
-    .dedupe-item:first-of-type {
-      border-top: none;
-      margin-top: 0;
-    }
-
-    .dedupe-item-info {
-      font-size: 0.82rem;
+    .detail-value a {
+      color: var(--blue-800);
+      word-break: break-word;
     }
 
     mark {
-      background: #fef3c7;
-      padding: 0 1px;
-      border-radius: 2px;
+      background: #fde68a;
+      padding: 0 2px;
+      border-radius: 3px;
     }
 
-    @media (max-width: 768px) {
-      .card {
-        padding: 12px 12px;
-      }
+    .toast {
+      position: fixed;
+      right: 18px;
+      bottom: 18px;
+      z-index: 100;
+      background: var(--green-900);
+      color: white;
+      border-radius: 16px;
+      padding: 12px 14px;
+      max-width: 380px;
+      box-shadow: var(--shadow);
+      display: none;
+      font-size: .9rem;
+    }
 
-      /* Masquer une colonne non prioritaire sur mobile (par ex. Filière) dans le tableau principal */
-      #tab-table th:nth-child(6),
-      #tab-table td:nth-child(6) {
-        display: none;
-      }
+    .toast.show { display: block; }
 
-      .detail-grid {
-        grid-template-columns: 1fr;
-      }
+    @media (max-width: 1050px) {
+      .layout { grid-template-columns: 1fr; }
+      .filters { position: static; }
+      .kpis { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .cards, .insights-grid { grid-template-columns: 1fr; }
+    }
 
-      .chart-row {
-        grid-template-columns: 1fr;
-      }
-
-      .modal-content {
-        border-radius: 12px;
-      }
-
-      .modal-header {
-        border-radius: 12px 12px 0 0;
-      }
+    @media (max-width: 680px) {
+      .app { width: min(100% - 18px, 1260px); padding-top: 10px; }
+      .hero { padding: 20px; border-radius: 22px; }
+      .kpis { grid-template-columns: 1fr; }
+      .toolbar { align-items: flex-start; flex-direction: column; }
+      .columns-list { grid-template-columns: 1fr; }
+      .detail-grid { grid-template-columns: 1fr; }
+      .detail-label { padding-bottom: 2px; }
+      .detail-value { border-top: 0; padding-top: 2px; }
+      .bar-row { grid-template-columns: 1fr 1fr 35px; }
     }
   </style>
 </head>
 <body>
-
-<div class="app-container">
-  <h1>Inventaire des recherches en nutrition à Madagascar</h1>
-  <p class="subtitle">
-    Application locale pour recenser les travaux, les équipes impliquées, les produits issus des recherches et leur potentiel de vulgarisation.
-  </p>
-
-  <!-- ONGLET -->
-  <div class="tabs">
-    <button class="tab-button active" data-tab="form">Fiche</button>
-    <button class="tab-button" data-tab="table">Tableau</button>
-    <button class="tab-button" data-tab="products">Produits</button>
-    <button class="tab-button" data-tab="stats">Statistiques</button>
-  </div>
-
-  <!-- ONGLET FICHE -->
-  <section id="tab-form" class="tab-section active">
-    <div class="card">
-      <div class="card-header">
-        <div class="card-title">
-          <span class="dot"></span>
-          <span>Nouvelle recherche / Modifier une fiche</span>
+  <div class="app">
+    <header class="hero">
+      <div class="hero-content">
+        <div class="eyebrow">🌿 Plateforme MIKASA · Nutrition Madagascar</div>
+        <h1>Inventaire consultable des recherches en nutrition</h1>
+        <p class="subtitle">
+          Lecture rapide des travaux recensés, avec focus sur les thèmes, le lien PNN/PNAMN, les populations prioritaires, l’exploitabilité et les lacunes de capitalisation.
+        </p>
+        <div class="hero-actions">
+          <label class="file-label" for="excel-input">⬆ Importer un Excel</label>
+          <input id="excel-input" class="hidden-file" type="file" accept=".xlsx,.xls,.csv" />
+          <button class="btn btn-secondary" id="reload-default-btn" type="button">🔁 Recharger le fichier GitHub</button>
+          <button class="btn btn-secondary" id="template-btn" type="button">⬇ Modèle Excel allégé</button>
+          <button class="btn btn-secondary" id="clear-btn" type="button">🧹 Vider les données locales</button>
         </div>
-        <div class="badge">
-          <span id="entry-count">0</span> fiche(s) enregistrée(s)
+        <div class="status-line" id="status-line">
+          Placez un fichier nommé <strong>mikasa_nutrition_BASE.xlsx</strong> ou <strong>7 mikasa_nutrition_BASE.xlsx</strong> à côté de cette page pour un chargement automatique.
         </div>
       </div>
+    </header>
 
-      <form id="study-form">
-        <input type="hidden" id="edit-index" value="-1" />
-
-        <div class="field full-width">
-          <label for="title">Titre de la recherche</label>
-          <input id="title" type="text" required
-                 placeholder="Ex. État nutritionnel des enfants de moins de 5 ans dans …" />
-        </div>
-
+    <div class="layout">
+      <aside class="panel filters">
+        <h2 class="panel-title">🔎 Filtres</h2>
         <div class="field">
-          <label for="institution">Institution / organisme porteur</label>
-          <input id="institution" type="text"
-                 placeholder="Université, centre de recherche, ONG, ministère, etc." />
+          <label for="search-input">Recherche</label>
+          <input id="search-input" type="search" placeholder="Titre, thème, institution, région…" />
         </div>
-
         <div class="field">
-          <label for="year">Année</label>
-          <input id="year" type="number" min="1950" max="2100" placeholder="2023" />
+          <label for="theme-filter">Thème général</label>
+          <select id="theme-filter"><option value="">Tous les thèmes</option></select>
         </div>
-
         <div class="field">
-          <label for="author">Auteur principal</label>
-          <input id="author" type="text" placeholder="Nom Prénom" />
+          <label for="pnn-filter">Axe PNN / PNAMN</label>
+          <select id="pnn-filter"><option value="">Tous les axes</option></select>
         </div>
-
         <div class="field">
-          <label for="coauthors">Co-auteurs</label>
-          <input id="coauthors" type="text" placeholder="Noms séparés par des virgules" />
+          <label for="exploit-filter">Exploitabilité</label>
+          <select id="exploit-filter"><option value="">Tous les niveaux</option></select>
         </div>
-
         <div class="field">
-          <label for="email">Contact email</label>
-          <input id="email" type="email" placeholder="auteur@institution.mg" />
+          <label for="priority-filter">Priorité de vérification</label>
+          <select id="priority-filter"><option value="">Toutes les priorités</option></select>
         </div>
-
         <div class="field">
-          <label for="phone">Contact téléphone</label>
-          <input id="phone" type="tel" placeholder="+261 …" />
+          <label for="period-filter">Période</label>
+          <select id="period-filter"><option value="">Toutes les périodes</option></select>
         </div>
+        <button class="btn btn-quiet" id="reset-filters-btn" type="button">Réinitialiser les filtres</button>
+        <p class="mini-note">
+          Le tableau principal reste volontairement léger. Les champs analytiques complets sont dans la fiche détaillée.
+        </p>
+      </aside>
 
-        <div class="field full-width">
-          <label for="domain">Catégorie scientifique (domaine et type de recherche)</label>
-          <input id="domain" type="text"
-                 placeholder="Ex. Nutrition infantile | Enquête transversale | Fortification…" />
-        </div>
+      <main class="main">
+        <section class="kpis" aria-label="Indicateurs synthétiques">
+          <div class="kpi"><div class="kpi-value" id="kpi-total">0</div><div class="kpi-label">fiches dans l’inventaire</div></div>
+          <div class="kpi"><div class="kpi-value" id="kpi-themes">0</div><div class="kpi-label">thèmes généraux couverts</div></div>
+          <div class="kpi"><div class="kpi-value" id="kpi-direct">0</div><div class="kpi-label">fiches avec lien PNN/PNAMN direct</div></div>
+          <div class="kpi"><div class="kpi-value" id="kpi-high">0</div><div class="kpi-label">fiches à exploitabilité forte</div></div>
+        </section>
 
-        <div class="field">
-          <label for="filiere">Filière</label>
-          <input id="filiere" type="text"
-                 placeholder="Riz, maïs, manioc, produits laitiers, etc. (texte libre)" />
-        </div>
+        <nav class="tabs" aria-label="Navigation">
+          <button class="tab active" data-view="cards" type="button">Cartes</button>
+          <button class="tab" data-view="table" type="button">Tableau</button>
+          <button class="tab" data-view="insights" type="button">Synthèses</button>
+          <button class="tab" data-view="columns" type="button">Colonnes à garder</button>
+        </nav>
 
-        <div class="field">
-          <label for="product_final">Produit final étudié</label>
-          <input id="product_final" type="text"
-                 placeholder="Produit spécifique, formulation, aliment ciblé…" />
-        </div>
-
-        <div class="field">
-          <label for="region-study">Région d’étude</label>
-          <input id="region-study" type="text" list="regions-list"
-                 placeholder="Ex. Analamanga, Haute Matsiatra, DIANA, national…" />
-        </div>
-
-        <div class="field">
-          <label for="zone-study">Zone d’étude (texte libre)</label>
-          <input id="zone-study" type="text"
-                 placeholder="Districts, communes, rural/urbain, etc." />
-        </div>
-
-        <div class="field">
-          <label for="region-researcher">Région du chercheur / équipe</label>
-          <input id="region-researcher" type="text" list="regions-list"
-                 placeholder="Région d’affiliation principale" />
-        </div>
-
-        <div class="field">
-          <label for="target">Population / groupe cible</label>
-          <input id="target" type="text"
-                 placeholder="Enfants, femmes en âge de procréer, ménages ruraux, etc." />
-        </div>
-
-        <div class="field full-width">
-          <label for="keywords">Mots-clés</label>
-          <input id="keywords" type="text"
-                 placeholder="Séparés par des virgules : malnutrition, vitamine A, sécurité alimentaire…" />
-        </div>
-
-        <div class="field full-width">
-          <label for="summary">Résumé / grandes lignes</label>
-          <textarea id="summary"
-                    placeholder="Objectifs, méthodologie, principaux résultats, implications…"></textarea>
-        </div>
-
-        <!-- SORTIES / PRODUCTIONS -->
-        <div class="field full-width">
-          <label>Sorties / productions scientifiques et techniques</label>
-          <div class="products-group">
-            <label class="checkbox-inline">
-              <input type="checkbox" class="product-checkbox" value="Article scientifique" />
-              Article scientifique
-            </label>
-            <label class="checkbox-inline">
-              <input type="checkbox" class="product-checkbox" value="Mémoire ou thèse" />
-              Mémoire ou thèse
-            </label>
-            <label class="checkbox-inline">
-              <input type="checkbox" class="product-checkbox" value="Rapport technique / bailleur" />
-              Rapport technique / bailleur
-            </label>
-            <label class="checkbox-inline">
-              <input type="checkbox" class="product-checkbox" value="Base de données" />
-              Base de données
-            </label>
-            <label class="checkbox-inline">
-              <input type="checkbox" class="product-checkbox" value="Guide ou manuel" />
-              Guide / manuel
-            </label>
-            <label class="checkbox-inline">
-              <input type="checkbox" class="product-checkbox" value="Outil ou protocole de suivi" />
-              Outil / protocole de suivi
-            </label>
-            <label class="checkbox-inline">
-              <input type="checkbox" class="product-checkbox" value="Produit ou formulation alimentaire" />
-              Produit / formulation alimentaire
-            </label>
-            <label class="checkbox-inline">
-              <input type="checkbox" class="product-checkbox" value="Programme ou module de formation" />
-              Programme / module de formation
-            </label>
-            <label class="checkbox-inline">
-              <input type="checkbox" class="product-checkbox" value="Poster scientifique" />
-              Poster scientifique
-            </label>
-            <label class="checkbox-inline">
-              <input type="checkbox" class="product-checkbox" value="Présentation orale / communication" />
-              Présentation orale / communication
-            </label>
+        <div class="toolbar">
+          <div class="results-count" id="results-count">Aucune donnée chargée.</div>
+          <div style="display:flex; gap:8px; flex-wrap:wrap;">
+            <button class="btn btn-quiet" id="export-filtered-btn" type="button">⬇ Export filtré</button>
           </div>
-          <label for="products-other">Autres sorties ou précisions</label>
-          <input id="products-other" type="text" placeholder="Autres types de productions" />
-          <!-- champ caché utilisé pour stocker la valeur finale -->
-          <textarea id="products" style="display:none;"></textarea>
         </div>
 
-        <div class="field">
-          <label for="dissemination-potential">Potentiel de vulgarisation</label>
-          <select id="dissemination-potential">
-            <option value="">Non précisé</option>
-            <option value="1">Faible</option>
-            <option value="2">Modéré</option>
-            <option value="3">Bon</option>
-            <option value="4">Très bon</option>
-            <option value="5">Excellent</option>
-          </select>
-        </div>
+        <section id="view-cards" class="view active">
+          <div class="cards" id="cards-container"></div>
+        </section>
 
-        <div class="field">
-          <label for="dissemination-notes">Commentaire sur le potentiel</label>
-          <textarea id="dissemination-notes"
-                    placeholder="Conditions de diffusion, freins, partenaires possibles…"></textarea>
-        </div>
+        <section id="view-table" class="view">
+          <div class="table-wrap" style="overflow:auto; max-height: 660px;">
+            <table>
+              <thead>
+                <tr>
+                  <th>Titre</th>
+                  <th>Année / période</th>
+                  <th>Institution</th>
+                  <th>Thème</th>
+                  <th>PNN / PNAMN</th>
+                  <th>Population / zone</th>
+                  <th>Exploitabilité</th>
+                  <th></th>
+                </tr>
+              </thead>
+              <tbody id="table-body"></tbody>
+            </table>
+          </div>
+        </section>
 
-        <div class="field full-width">
-          <label for="communications">Communications scientifiques déjà effectuées</label>
-          <textarea id="communications"
-                    placeholder="Articles, conférences, posters, rapports pour bailleurs, etc."></textarea>
-        </div>
+        <section id="view-insights" class="view">
+          <div class="insights-grid">
+            <div class="insight-card"><h2 class="panel-title">Thèmes généraux</h2><div id="chart-themes"></div></div>
+            <div class="insight-card"><h2 class="panel-title">Axes PNN / PNAMN</h2><div id="chart-pnn"></div></div>
+            <div class="insight-card"><h2 class="panel-title">Exploitabilité</h2><div id="chart-exploit"></div></div>
+            <div class="insight-card"><h2 class="panel-title">Lacunes repérées</h2><div id="chart-gaps"></div></div>
+          </div>
+        </section>
 
-        <div class="field full-width">
-          <label for="links">Liens vers les documents</label>
-          <textarea id="links"
-                    placeholder="URLs ou références : https://…, dépôt institutionnel, DOI, etc."></textarea>
-        </div>
-
-        <div class="field full-width">
-          <label for="other">Autres informations pertinentes</label>
-          <textarea id="other"
-                    placeholder="Partenaires, financement, statut (en cours / terminé), remarques diverses…"></textarea>
-        </div>
-
-        <div class="actions-row full-width">
-          <button type="button" class="btn-secondary" id="reset-btn">
-            🔄 Réinitialiser le formulaire
-          </button>
-          <button type="submit" class="btn-primary" id="submit-btn">
-            💾 Enregistrer la fiche
-          </button>
-        </div>
-      </form>
-    </div>
-  </section>
-
-  <!-- ONGLET TABLEAU -->
-  <section id="tab-table" class="tab-section">
-    <div class="card">
-      <div class="card-header">
-        <div class="card-title">
-          <span class="dot"></span>
-          <span>Tableau des recherches inventorées</span>
-        </div>
-      </div>
-
-      <div id="search-bar-container">
-        <input id="search-input" type="text"
-               placeholder="Filtrer par titre, institution, auteur, mots-clés, région, filière..." />
-        <span class="hint">Filtrage plein texte sur les colonnes principales.</span>
-      </div>
-
-      <div style="margin-top:4px;">
-        <span class="hint" id="table-count-hint">
-          0 fiche(s) affichée(s) sur 0
-        </span>
-      </div>
-
-      <div class="actions-row" style="margin-top:4px; justify-content:flex-start; align-items:center;">
-        <button type="button" class="btn-primary btn-small" id="export-excel-btn">
-          ⬇ Exporter Excel
-        </button>
-        <label class="btn-secondary btn-small" style="cursor:pointer;">
-          ⬆ Importer Excel
-          <input type="file" id="import-excel-input" accept=".xlsx,.xls" style="display:none;" />
-        </label>
-        <select id="import-mode" style="margin-left:6px; padding:4px 8px; font-size:0.8rem;">
-          <option value="append">Mode import : ajouter</option>
-          <option value="overwrite">Mode import : écraser</option>
-        </select>
-      </div>
-
-      <div class="actions-row" style="margin-top:4px; justify-content:flex-start;">
-        <button type="button" class="btn-secondary btn-small" id="bulk-delete-btn">
-          🗑️ Supprimer la sélection
-        </button>
-        <button type="button" class="btn-secondary btn-small" id="dedupe-btn">
-          ♻️ Supprimer les doublons
-        </button>
-      </div>
-
-      <div style="overflow-x: auto; max-height: 420px; margin-top: 6px;">
-        <table>
-          <thead>
-          <tr>
-            <th><input type="checkbox" id="select-all" /></th>
-            <th data-sort-key="title">Titre</th>
-            <th data-sort-key="institution">Institution</th>
-            <th data-sort-key="author">Auteur(s)</th>
-            <th data-sort-key="year">Année</th>
-            <th data-sort-key="filiere">Filière</th>
-            <th data-sort-key="product_final">Produit final</th>
-            <th data-sort-key="region_target">Région d’étude / groupe cible</th>
-            <th class="col-actions">Actions</th>
-          </tr>
-          </thead>
-          <tbody id="studies-tbody"></tbody>
-        </table>
-      </div>
-    </div>
-  </section>
-
-  <!-- ONGLET PRODUITS -->
-  <section id="tab-products" class="tab-section">
-    <div class="card">
-      <div class="card-header">
-        <div class="card-title">
-          <span class="dot"></span>
-          <span>Produits et filières issus des recherches</span>
-        </div>
-      </div>
-      <p class="hint" style="margin-bottom:8px;">
-        Synthèse des produits finaux, regroupés par filière et associés aux régions d’étude.
-        La colonne “Processus / remarques” reprend uniquement les résumés des fiches, avec accès direct aux fiches sources.
-      </p>
-
-      <div style="display:flex; flex-wrap:wrap; gap:8px; align-items:center; margin-bottom:6px;">
-        <label for="products-filter-filiere" class="hint">Filtrer par filière :</label>
-        <select id="products-filter-filiere" style="min-width:160px; padding:4px 8px; font-size:0.8rem;">
-          <option value="">Toutes les filières</option>
-        </select>
-      </div>
-
-      <div style="overflow-x:auto; max-height: 420px; margin-top: 6px;">
-        <table>
-          <thead>
-          <tr>
-            <th>Filière</th>
-            <th>Produit final</th>
-            <th>Régions d’étude</th>
-            <th>Processus / remarques issues des fiches</th>
-            <th>Fiches sources</th>
-          </tr>
-          </thead>
-          <tbody id="products-tbody"></tbody>
-        </table>
-      </div>
-    </div>
-  </section>
-
-  <!-- ONGLET STATISTIQUES -->
-  <section id="tab-stats" class="tab-section">
-    <div class="card">
-      <div class="card-header">
-        <div class="card-title">
-          <span class="dot"></span>
-          <span>Statistiques synthétiques</span>
-        </div>
-      </div>
-      <p class="hint" style="margin-bottom:10px;">
-        Les graphiques et tableaux se mettent à jour automatiquement en fonction des fiches enregistrées.
-        Cliquer sur une barre de région ou de filière applique automatiquement un filtre dans le tableau.
-      </p>
-
-      <div class="stats-block">
-        <div class="stats-title">
-          <span class="dot"></span>
-          <span>Répartition par région d’étude</span>
-        </div>
-        <div class="stats-meta">
-          <span class="stats-badge">Graphique horizontal</span>
-          <span>Basé sur la région d’étude (et non la région du chercheur). Les combinaisons sont éclatées par région officielle.</span>
-        </div>
-        <div id="stats-region-chart" class="chart-block"></div>
-      </div>
-
-      <div class="stats-block">
-        <div class="stats-title">
-          <span class="dot"></span>
-          <span>Répartition par filière</span>
-        </div>
-        <div class="stats-meta">
-          <span class="stats-badge">Filières multiples comptées séparément</span>
-          <span>Une même fiche peut compter pour plusieurs filières (Riz / Maïs / Manioc → Riz, Maïs et Manioc). Les mentions génériques comme “etc.” sont ignorées.</span>
-        </div>
-        <div id="stats-filiere-chart" class="chart-block"></div>
-      </div>
-
-      <div class="stats-block">
-        <div class="stats-title">
-          <span class="dot"></span>
-          <span>Répartition par institution</span>
-        </div>
-        <table id="stats-institution-table">
-          <thead>
-          <tr><th>Institution</th><th>Nombre de recherches</th></tr>
-          </thead>
-          <tbody></tbody>
-        </table>
-      </div>
-    </div>
-  </section>
-</div>
-
-<!-- MODAL DÉTAILS -->
-<div id="detail-modal" class="modal-backdrop">
-  <div class="modal-content">
-    <div class="modal-header">
-      <div class="modal-title">
-        <span class="icon">🔍</span>
-        <span id="detail-title">Détails de la fiche</span>
-      </div>
-      <div class="modal-actions">
-        <button class="modal-close" id="detail-edit-btn">
-          <span class="icon">✏️</span>
-          <span>Éditer</span>
-        </button>
-        <button class="modal-close" id="detail-close-btn">
-          <span class="icon">✖</span>
-          <span>Fermer</span>
-        </button>
-      </div>
-    </div>
-    <div class="modal-body">
-      <div class="detail-grid" id="detail-grid">
-        <!-- rempli en JavaScript -->
-      </div>
+        <section id="view-columns" class="view">
+          <div class="panel recommendations">
+            <h2 class="panel-title">🧾 Colonnes recommandées pour un tableur allégé</h2>
+            <p class="mini-note">
+              Ces colonnes suffisent pour une consultation claire sur GitHub Pages. Les anciennes colonnes techniques de nettoyage peuvent rester dans un fichier de travail séparé, mais ne sont pas nécessaires pour la page publique.
+            </p>
+            <div class="columns-list" id="columns-list"></div>
+          </div>
+        </section>
+      </main>
     </div>
   </div>
-</div>
 
-<!-- MODAL FICHES SOURCES PRODUIT -->
-<div id="product-sources-modal" class="modal-backdrop">
-  <div class="modal-content">
-    <div class="modal-header">
-      <div class="modal-title">
-        <span class="icon">📑</span>
-        <span id="product-sources-title">Fiches sources du produit</span>
+  <div class="modal-backdrop" id="detail-modal">
+    <article class="modal" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+      <div class="modal-header">
+        <div>
+          <div class="card-topline" id="modal-chips"></div>
+          <h2 class="modal-title" id="modal-title">Détail de la fiche</h2>
+          <div class="meta" id="modal-meta"></div>
+        </div>
+        <button class="close" id="modal-close" type="button">✕ Fermer</button>
       </div>
-      <button class="modal-close" id="product-sources-close-btn">
-        <span class="icon">✖</span>
-        <span>Fermer</span>
-      </button>
-    </div>
-    <div class="modal-body">
-      <p class="hint" style="margin-bottom:8px;">
-        Chaque ligne correspond à une fiche de recherche qui mentionne ce produit. Les boutons permettent de consulter ou d’éditer directement la fiche.
-      </p>
-      <div id="product-sources-list"></div>
-    </div>
+      <div class="modal-body" id="modal-body"></div>
+    </article>
   </div>
-</div>
 
-<!-- MODAL DÉDOUBLONNAGE -->
-<div id="dedupe-modal" class="modal-backdrop">
-  <div class="modal-content">
-    <div class="modal-header">
-      <div class="modal-title">
-        <span class="icon">♻️</span>
-        <span>Vérification des doublons</span>
-      </div>
-      <button class="modal-close" id="dedupe-cancel-btn">
-        <span class="icon">✖</span>
-        <span>Fermer</span>
-      </button>
-    </div>
-    <div class="modal-body">
-      <p class="hint">
-        Les groupes ci-dessous rassemblent les fiches qui partagent le même trio (titre, institution, année).
-        Cochez les fiches à supprimer, puis validez.
-      </p>
-      <div id="dedupe-list" style="margin-top:8px;"></div>
-      <div class="actions-row" style="justify-content:flex-end; margin-top:12px;">
-        <button type="button" class="btn-primary btn-small" id="dedupe-confirm-btn">
-          Supprimer les fiches cochées
-        </button>
-      </div>
-    </div>
-  </div>
-</div>
+  <div class="toast" id="toast"></div>
 
-<!-- Liste de régions pour autocomplétion -->
-<datalist id="regions-list">
-  <option value="Analamanga"></option>
-  <option value="Vakinankaratra"></option>
-  <option value="Itasy"></option>
-  <option value="Bongolava"></option>
-  <option value="Alaotra-Mangoro"></option>
-  <option value="Atsinanana"></option>
-  <option value="Analanjirofo"></option>
-  <option value="Atsimo-Atsinanana"></option>
-  <option value="Vatovavy"></option>
-  <option value="Fitovinany"></option>
-  <option value="Menabe"></option>
-  <option value="Atsimo-Andrefana"></option>
-  <option value="Androy"></option>
-  <option value="Anosy"></option>
-  <option value="Ihorombe"></option>
-  <option value="Haute Matsiatra"></option>
-  <option value="Amoron'i Mania"></option>
-  <option value="Betsiboka"></option>
-  <option value="Boeny"></option>
-  <option value="Sofia"></option>
-  <option value="Melaky"></option>
-  <option value="DIANA"></option>
-  <option value="SAVA"></option>
-  <option value="National"></option>
-  <option value="Multi-régions"></option>
-</datalist>
+  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+  <script>
+  (() => {
+    "use strict";
 
-<!-- Librairie Excel -->
-<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+    const STORAGE_KEY = "mikasaNutritionConsultationDataV2";
+    const DEFAULT_EXCEL_FILES = ["mikasa_nutrition_BASE.xlsx", "7 mikasa_nutrition_BASE.xlsx"];
+    const PREFERRED_SHEETS = ["BASE (2)", "BASE", "Mikasa_nutrition"];
 
-<script>
-(function () {
-  const STORAGE_KEY = "nutritionStudiesMG";
-
-  let studies = [];
-
-  // Liste officielle des régions de Madagascar pour les stats
-  const MG_REGIONS = [
-    "Analamanga",
-    "Vakinankaratra",
-    "Itasy",
-    "Bongolava",
-    "Alaotra-Mangoro",
-    "Atsinanana",
-    "Analanjirofo",
-    "Atsimo-Atsinanana",
-    "Vatovavy",
-    "Fitovinany",
-    "Menabe",
-    "Atsimo-Andrefana",
-    "Androy",
-    "Anosy",
-    "Ihorombe",
-    "Haute Matsiatra",
-    "Amoron'i Mania",
-    "Betsiboka",
-    "Boeny",
-    "Sofia",
-    "Melaky",
-    "DIANA",
-    "SAVA"
-  ];
-
-  // éléments principaux
-  const form = document.getElementById("study-form");
-  const editIndexInput = document.getElementById("edit-index");
-  const entryCountSpan = document.getElementById("entry-count");
-  const searchInput = document.getElementById("search-input");
-  const tbody = document.getElementById("studies-tbody");
-  const productsTbody = document.getElementById("products-tbody");
-  const resetBtn = document.getElementById("reset-btn");
-  const submitBtn = document.getElementById("submit-btn");
-  const tableCountHint = document.getElementById("table-count-hint");
-  const productsFilterFiliereSelect = document.getElementById("products-filter-filiere");
-
-  const exportExcelBtn = document.getElementById("export-excel-btn");
-  const importExcelInput = document.getElementById("import-excel-input");
-  const importModeSelect = document.getElementById("import-mode");
-  const bulkDeleteBtn = document.getElementById("bulk-delete-btn");
-  const dedupeBtn = document.getElementById("dedupe-btn");
-  const selectAllCheckbox = document.getElementById("select-all");
-
-  const fields = {
-    title: document.getElementById("title"),
-    institution: document.getElementById("institution"),
-    year: document.getElementById("year"),
-    author: document.getElementById("author"),
-    coauthors: document.getElementById("coauthors"),
-    email: document.getElementById("email"),
-    phone: document.getElementById("phone"),
-    domain: document.getElementById("domain"),
-    filiere: document.getElementById("filiere"),
-    product_final: document.getElementById("product_final"),
-    regionStudy: document.getElementById("region-study"),
-    zoneStudy: document.getElementById("zone-study"),
-    regionResearcher: document.getElementById("region-researcher"),
-    target: document.getElementById("target"),
-    keywords: document.getElementById("keywords"),
-    summary: document.getElementById("summary"),
-    products: document.getElementById("products"),
-    disseminationPotential: document.getElementById("dissemination-potential"),
-    disseminationNotes: document.getElementById("dissemination-notes"),
-    communications: document.getElementById("communications"),
-    links: document.getElementById("links"),
-    other: document.getElementById("other"),
-  };
-
-  const productCheckboxes = document.querySelectorAll(".product-checkbox");
-  const productsOtherInput = document.getElementById("products-other");
-
-  // Modal détails
-  const detailModal = document.getElementById("detail-modal");
-  const detailGrid = document.getElementById("detail-grid");
-  const detailTitle = document.getElementById("detail-title");
-  const detailCloseBtn = document.getElementById("detail-close-btn");
-  const detailEditBtn = document.getElementById("detail-edit-btn");
-  let currentDetailIndex = null;
-
-  // Modal fiches sources produits
-  const productSourcesModal = document.getElementById("product-sources-modal");
-  const productSourcesTitle = document.getElementById("product-sources-title");
-  const productSourcesList = document.getElementById("product-sources-list");
-  const productSourcesCloseBtn = document.getElementById("product-sources-close-btn");
-
-  // Modal dédoublonnage
-  const dedupeModal = document.getElementById("dedupe-modal");
-  const dedupeList = document.getElementById("dedupe-list");
-  const dedupeConfirmBtn = document.getElementById("dedupe-confirm-btn");
-  const dedupeCancelBtn = document.getElementById("dedupe-cancel-btn");
-
-  // Onglets
-  const tabButtons = document.querySelectorAll(".tab-button");
-  const tabSections = document.querySelectorAll(".tab-section");
-
-  // Stats containers
-  const statsRegionChart = document.getElementById("stats-region-chart");
-  const statsFiliereChart = document.getElementById("stats-filiere-chart");
-  const statsInstitutionTableBody = document.querySelector("#stats-institution-table tbody");
-
-  // Tri tableau
-  const sortableHeaders = document.querySelectorAll('#tab-table thead th[data-sort-key]');
-  let sortKey = null;
-  let sortDir = "asc";
-
-  sortableHeaders.forEach(th => {
-    th.dataset.label = th.textContent.trim();
-    th.style.cursor = "pointer";
-    th.addEventListener("click", () => {
-      const key = th.getAttribute("data-sort-key");
-      if (sortKey === key) {
-        sortDir = sortDir === "asc" ? "desc" : "asc";
-      } else {
-        sortKey = key;
-        sortDir = "asc";
-      }
-      renderTable();
-    });
-  });
-
-  function updateSortIndicators() {
-    sortableHeaders.forEach(th => {
-      const base = th.dataset.label || th.textContent.replace(/[▲▼]\s*$/, "").trim();
-      th.textContent = base;
-      const key = th.getAttribute("data-sort-key");
-      if (sortKey === key) {
-        th.textContent = base + (sortDir === "asc" ? " ▲" : " ▼");
-      }
-    });
-  }
-
-  function switchToTab(tabName) {
-    tabButtons.forEach(b => {
-      const t = b.getAttribute("data-tab");
-      if (t === tabName) b.classList.add("active");
-      else b.classList.remove("active");
-    });
-    tabSections.forEach(s => {
-      if (s.id === "tab-" + tabName) s.classList.add("active");
-      else s.classList.remove("active");
-    });
-  }
-
-  // Gestion des onglets
-  tabButtons.forEach(btn => {
-    btn.addEventListener("click", () => {
-      const tab = btn.getAttribute("data-tab");
-      switchToTab(tab);
-    });
-  });
-
-  // LocalStorage
-  function loadFromStorage() {
-    try {
-      const raw = localStorage.getItem(STORAGE_KEY);
-      studies = raw ? JSON.parse(raw) : [];
-    } catch (e) {
-      studies = [];
-    }
-
-    // Compat ascendante avec ancien schéma
-    studies = studies.map(s => {
-      const copy = { ...s };
-
-      if (!copy.regionStudy && copy.region) {
-        copy.regionStudy = copy.region;
-      }
-
-      if (!copy.domain && copy.domaine) {
-        copy.domain = copy.domaine;
-      }
-      if (copy.type) {
-        if (copy.domain && !copy.domain.includes(copy.type)) {
-          copy.domain = copy.domain + " | " + copy.type;
-        } else if (!copy.domain) {
-          copy.domain = copy.type;
-        }
-      }
-
-      return copy;
-    });
-
-    renderTable();
-    renderStats();
-    renderProductsTable();
-  }
-
-  function saveToStorage() {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(studies));
-  }
-
-  // Form
-  function clearForm() {
-    form.reset();
-    editIndexInput.value = "-1";
-    submitBtn.textContent = "💾 Enregistrer la fiche";
-    productCheckboxes.forEach(cb => cb.checked = false);
-    productsOtherInput.value = "";
-  }
-
-  function potentialLabel(value) {
-    const v = parseInt(value, 10);
-    switch (v) {
-      case 1: return "Faible";
-      case 2: return "Modéré";
-      case 3: return "Bon";
-      case 4: return "Très bon";
-      case 5: return "Excellent";
-      default: return "";
-    }
-  }
-
-  function truncate(text, max) {
-    if (!text) return "";
-    if (text.length <= max) return text;
-    return text.slice(0, max - 1) + "…";
-  }
-
-  function escapeHtml(str) {
-    if (typeof str !== "string") return "";
-    return str.replace(/[&<>"']/g, function (tag) {
-      const chars = {
-        "&": "&amp;",
-        "<": "&lt;",
-        ">": "&gt;",
-        '"': "&quot;",
-        "'": "&#039;",
-      };
-      return chars[tag] || tag;
-    });
-  }
-
-  function escapeRegExp(str) {
-    return str.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-  }
-
-  function highlight(text) {
-    const filter = (searchInput && searchInput.value || "").trim();
-    const safe = escapeHtml(text || "");
-    if (!filter) return safe;
-    try {
-      const pattern = new RegExp("(" + escapeRegExp(filter) + ")", "gi");
-      return safe.replace(pattern, "<mark>$1</mark>");
-    } catch (e) {
-      return safe;
-    }
-  }
-
-  function buildProductsString() {
-    const selected = Array.from(productCheckboxes)
-      .filter(cb => cb.checked)
-      .map(cb => cb.value.trim());
-    const otherVal = productsOtherInput.value.trim();
-    if (otherVal) selected.push(otherVal);
-    return selected.join(" | ");
-  }
-
-  function populateProductsFromString(text) {
-    productCheckboxes.forEach(cb => cb.checked = false);
-    productsOtherInput.value = "";
-    if (!text) return;
-    const parts = text.split("|").map(p => p.trim()).filter(Boolean);
-    const leftovers = [];
-    parts.forEach(p => {
-      const match = Array.from(productCheckboxes).find(cb => cb.value === p);
-      if (match) {
-        match.checked = true;
-      } else {
-        leftovers.push(p);
-      }
-    });
-    if (leftovers.length) {
-      productsOtherInput.value = leftovers.join(" ; ");
-    }
-  }
-
-  function populateForm(study) {
-    fields.title.value = study.title || "";
-    fields.institution.value = study.institution || "";
-    fields.year.value = study.year || "";
-    fields.author.value = study.author || "";
-    fields.coauthors.value = study.coauthors || "";
-    fields.email.value = study.email || "";
-    fields.phone.value = study.phone || "";
-    fields.domain.value = study.domain || "";
-    fields.filiere.value = study.filiere || "";
-    fields.product_final.value = study.product_final || "";
-    fields.regionStudy.value = study.regionStudy || study.region || "";
-    fields.zoneStudy.value = study.zoneStudy || "";
-    fields.regionResearcher.value = study.regionResearcher || "";
-    fields.target.value = study.target || "";
-    fields.keywords.value = study.keywords || "";
-    fields.summary.value = study.summary || "";
-    fields.disseminationPotential.value = study.disseminationPotential || "";
-    fields.disseminationNotes.value = study.disseminationNotes || "";
-    fields.communications.value = study.communications || "";
-    fields.links.value = study.links || "";
-    fields.other.value = study.other || "";
-    populateProductsFromString(study.products || "");
-  }
-
-  function askValidationCode(actionLabel) {
-    const code = prompt("Code de validation requis pour " + actionLabel + " :");
-    if (code === null) return false;
-    if (code.trim() !== "t1406") {
-      alert("Code incorrect. Action annulée.");
-      return false;
-    }
-    return true;
-  }
-
-  function onEdit(index) {
-    const study = studies[index];
-    if (!study) return;
-    if (!askValidationCode("modifier cette fiche")) return;
-    populateForm(study);
-    editIndexInput.value = index;
-    submitBtn.textContent = "✏️ Mettre à jour la fiche";
-    window.scrollTo({ top: 0, behavior: "smooth" });
-    switchToTab("form");
-  }
-
-  function onDuplicate(index) {
-    const study = studies[index];
-    if (!study) return;
-    populateForm(study);
-    editIndexInput.value = "-1";
-    submitBtn.textContent = "💾 Enregistrer la fiche";
-    window.scrollTo({ top: 0, behavior: "smooth" });
-    switchToTab("form");
-  }
-
-  function onDelete(index) {
-    const study = studies[index];
-    if (!study) return;
-    if (!askValidationCode("supprimer cette fiche")) return;
-    if (confirm("Supprimer cette fiche ?\n\n" + (study.title || "Sans titre"))) {
-      studies.splice(index, 1);
-      saveToStorage();
-      renderTable();
-      renderStats();
-      renderProductsTable();
-    }
-  }
-
-  // Modal détails
-  function openDetailModal(index) {
-    const study = studies[index];
-    if (!study) return;
-    currentDetailIndex = index;
-    detailTitle.textContent = study.title || "Détails de la fiche";
-
-    const rows = [
-      ["Institution", study.institution],
-      ["Année", study.year],
-      ["Auteur principal", study.author],
-      ["Co-auteurs", study.coauthors],
-      ["Email", study.email],
-      ["Téléphone", study.phone],
-      ["Catégorie scientifique (domaine & type)", study.domain],
-      ["Filière", study.filiere],
-      ["Produit final étudié", study.product_final],
-      ["Région d’étude", study.regionStudy || study.region],
-      ["Zone d’étude", study.zoneStudy],
-      ["Région du chercheur / équipe", study.regionResearcher],
-      ["Population / groupe cible", study.target],
-      ["Mots-clés", study.keywords],
-      ["Résumé / grandes lignes", study.summary],
-      ["Sorties / productions", study.products],
-      ["Potentiel de vulgarisation", potentialLabel(study.disseminationPotential)],
-      ["Commentaire sur le potentiel", study.disseminationNotes],
-      ["Communications scientifiques", study.communications],
-      ["Liens", study.links],
-      ["Autres informations", study.other],
+    const ESSENTIAL_COLUMNS = [
+      ["ID", "Identifiant stable de la fiche."],
+      ["titre", "Titre complet de la recherche."],
+      ["annee", "Année ou période courte, lisible dans le tableau."],
+      ["periode_auto", "Période recodée, utile pour filtrer les tendances."],
+      ["institution_standardisee", "Nom harmonisé de l’institution. À défaut, garder institution."],
+      ["auteur", "Auteur principal ou personne responsable."],
+      ["filiere", "Filière ou aliment étudié, quand la fiche porte sur un produit."],
+      ["produit_final", "Produit, formulation ou aliment final étudié."],
+      ["theme_general_v2", "Grand thème de classement."],
+      ["theme_detaille_v2", "Sous-thème plus précis."],
+      ["theme_interet_strategique", "Angle d’intérêt pour la restitution."],
+      ["objet_recherche_v2", "Objet principal : population, produit, méthode, politique, etc."],
+      ["type_demarche_v2", "Diagnostic, expérimentation, revue, formulation, évaluation…"],
+      ["axe_pnn_pnamn_v2", "Axe de rattachement aux cadres nationaux."],
+      ["lien_pnn_pnamn_v2", "Lien direct, indirect ou faible avec PNN/PNAMN."],
+      ["population_prioritaire_v2", "Population prioritaire concernée."],
+      ["zone_prioritaire_v2", "Zone prioritaire ou niveau géographique."],
+      ["region_etude", "Région ou zone d’étude lisible."],
+      ["niveau_exploitabilite_v2", "Niveau d’usage possible pour l’analyse ou la capitalisation."],
+      ["potentiel_capitalisation_v2", "Intérêt pour une restitution, une synthèse ou une valorisation."],
+      ["type_lacune_auto_v2", "Lacune repérée : géographique, thématique, méthode, disponibilité…"],
+      ["priorite_verification_v2", "Priorité de correction ou de vérification humaine."],
+      ["resume", "Objectifs, méthode et résultats essentiels."],
+      ["productions", "Livrables, publications, mémoires, rapports, communications."],
+      ["liens", "URL, DOI, dépôt, référence documentaire."],
+      ["commentaire_recodage_v2", "Note courte pour expliquer les arbitrages de classement."]
     ];
 
-    detailGrid.innerHTML = "";
-    rows.forEach(([label, value]) => {
-      const labelDiv = document.createElement("div");
-      labelDiv.className = "detail-label";
-      labelDiv.textContent = label;
-
-      const valueDiv = document.createElement("div");
-      valueDiv.className = "detail-value";
-      valueDiv.innerHTML = value ? escapeHtml(value).replace(/\n/g, "<br>") : "<span class='small-text'>—</span>";
-
-      detailGrid.appendChild(labelDiv);
-      detailGrid.appendChild(valueDiv);
-    });
-
-    detailModal.classList.add("show");
-  }
-
-  function closeDetailModal() {
-    detailModal.classList.remove("show");
-    currentDetailIndex = null;
-  }
-
-  if (detailCloseBtn && detailModal) {
-    detailCloseBtn.addEventListener("click", closeDetailModal);
-    detailModal.addEventListener("click", (e) => {
-      if (e.target === detailModal) closeDetailModal();
-    });
-  }
-
-  if (detailEditBtn) {
-    detailEditBtn.addEventListener("click", () => {
-      if (currentDetailIndex === null) return;
-      onEdit(currentDetailIndex);
-      closeDetailModal();
-    });
-  }
-
-  // Modal fiches sources produits
-  function openProductSourcesModal(entry) {
-    if (!productSourcesModal || !productSourcesList) return;
-    const label = (entry.filiere || "") + (entry.product_final ? " – " + entry.product_final : "");
-    productSourcesTitle.textContent = label || "Fiches sources du produit";
-
-    productSourcesList.innerHTML = "";
-
-    if (!entry.indexes || !entry.indexes.length) {
-      const div = document.createElement("div");
-      div.className = "no-data";
-      div.textContent = "Aucune fiche source trouvée pour ce produit.";
-      productSourcesList.appendChild(div);
-      productSourcesModal.classList.add("show");
-      return;
-    }
-
-    entry.indexes.forEach(idx => {
-      const s = studies[idx];
-      if (!s) return;
-
-      const item = document.createElement("div");
-      item.className = "product-source-item";
-
-      const main = document.createElement("div");
-      main.className = "product-source-main";
-      main.innerHTML =
-        "<strong>" + escapeHtml(s.title || "Sans titre") + "</strong><br>" +
-        "<span class='small-text'>" +
-        escapeHtml(s.institution || "") +
-        (s.year ? " • " + escapeHtml(String(s.year)) : "") +
-        "</span>";
-
-      const actions = document.createElement("div");
-      actions.style.display = "flex";
-      actions.style.flexWrap = "wrap";
-      actions.style.gap = "4px";
-
-      const btnView = document.createElement("button");
-      btnView.type = "button";
-      btnView.className = "btn-chip btn-chip-info";
-      btnView.innerHTML = '<span class="icon">🔍</span><span>Voir la fiche</span>';
-      btnView.addEventListener("click", (e) => {
-        e.preventDefault();
-        openDetailModal(idx);
-      });
-
-      const btnEdit = document.createElement("button");
-      btnEdit.type = "button";
-      btnEdit.className = "btn-chip btn-chip-edit";
-      btnEdit.innerHTML = '<span class="icon">✏️</span><span>Éditer</span>';
-      btnEdit.addEventListener("click", (e) => {
-        e.preventDefault();
-        onEdit(idx);
-      });
-
-      actions.appendChild(btnView);
-      actions.appendChild(btnEdit);
-
-      item.appendChild(main);
-      item.appendChild(actions);
-      productSourcesList.appendChild(item);
-    });
-
-    productSourcesModal.classList.add("show");
-  }
-
-  function closeProductSourcesModal() {
-    if (productSourcesModal) {
-      productSourcesModal.classList.remove("show");
-    }
-  }
-
-  if (productSourcesCloseBtn && productSourcesModal) {
-    productSourcesCloseBtn.addEventListener("click", closeProductSourcesModal);
-    productSourcesModal.addEventListener("click", (e) => {
-      if (e.target === productSourcesModal) closeProductSourcesModal();
-    });
-  }
-
-  // Tableau principal
-  function renderTable() {
-    if (!tbody) return;
-    updateSortIndicators();
-    tbody.innerHTML = "";
-    if (entryCountSpan) entryCountSpan.textContent = studies.length.toString();
-    if (selectAllCheckbox) selectAllCheckbox.checked = false;
-
-    const filter = (searchInput && searchInput.value || "").toLowerCase().trim();
-
-    const filtered = studies.filter((s) => {
-      if (!filter) return true;
-      const text =
-        (s.title || "") + " " +
-        (s.institution || "") + " " +
-        (s.author || "") + " " +
-        (s.coauthors || "") + " " +
-        (s.domain || "") + " " +
-        (s.filiere || "") + " " +
-        (s.product_final || "") + " " +
-        (s.regionStudy || s.region || "") + " " +
-        (s.zoneStudy || "") + " " +
-        (s.regionResearcher || "") + " " +
-        (s.target || "") + " " +
-        (s.keywords || "") + " " +
-        (s.summary || "") + " " +
-        (s.products || "");
-      return text.toLowerCase().includes(filter);
-    });
-
-    // tri
-    if (sortKey) {
-      const direction = sortDir === "asc" ? 1 : -1;
-      filtered.sort((a, b) => {
-        function getVal(s) {
-          switch (sortKey) {
-            case "title": return s.title || "";
-            case "institution": return s.institution || "";
-            case "author": return ((s.author || "") + " " + (s.coauthors || ""));
-            case "year": return s.year || "";
-            case "filiere": return s.filiere || "";
-            case "product_final": return s.product_final || "";
-            case "region_target":
-              return (s.regionStudy || s.region || "") + " " + (s.target || "");
-            default: return "";
-          }
-        }
-        let va = getVal(a).toString().toLowerCase().trim();
-        let vb = getVal(b).toString().toLowerCase().trim();
-        let cmp = 0;
-        if (sortKey === "year") {
-          const na = parseInt(va, 10);
-          const nb = parseInt(vb, 10);
-          if (!isNaN(na) && !isNaN(nb)) {
-            cmp = na - nb;
-          } else {
-            if (va < vb) cmp = -1;
-            else if (va > vb) cmp = 1;
-          }
-        } else {
-          if (va < vb) cmp = -1;
-          else if (va > vb) cmp = 1;
-        }
-        return cmp * direction;
-      });
-    }
-
-    if (tableCountHint) {
-      tableCountHint.textContent =
-        filtered.length + " fiche(s) affichée(s) sur " + studies.length;
-    }
-
-    if (filtered.length === 0) {
-      const tr = document.createElement("tr");
-      const td = document.createElement("td");
-      td.colSpan = 9;
-      td.className = "no-data";
-      td.textContent = "Aucune fiche ne correspond à ce filtre pour le moment.";
-      tr.appendChild(td);
-      tbody.appendChild(tr);
-      return;
-    }
-
-    filtered.forEach((study) => {
-      const realIndex = studies.indexOf(study);
-      const tr = document.createElement("tr");
-
-      const tdSelect = document.createElement("td");
-      const cb = document.createElement("input");
-      cb.type = "checkbox";
-      cb.className = "row-select";
-      cb.dataset.index = String(realIndex);
-      tdSelect.appendChild(cb);
-      tr.appendChild(tdSelect);
-
-      const tdTitle = document.createElement("td");
-      const titleHtml = highlight(study.title || "Sans titre");
-      let summaryHtml = "";
-      if (study.summary) {
-        summaryHtml =
-          "<br/><span class='small-text'>" +
-          highlight(truncate(study.summary, 80)) +
-          "</span>";
-      }
-      tdTitle.innerHTML = "<strong>" + titleHtml + "</strong>" + summaryHtml;
-      tr.appendChild(tdTitle);
-
-      const tdInst = document.createElement("td");
-      tdInst.innerHTML = highlight(study.institution || "");
-      tr.appendChild(tdInst);
-
-      const tdAuthors = document.createElement("td");
-      const mainAuthor = highlight(study.author || "");
-      let coauth = "";
-      if (study.coauthors) {
-        coauth = "<br/><span class='small-text'>" + highlight(study.coauthors) + "</span>";
-      }
-      tdAuthors.innerHTML = mainAuthor + coauth;
-      tr.appendChild(tdAuthors);
-
-      const tdYear = document.createElement("td");
-      tdYear.className = "nowrap";
-      tdYear.innerHTML = highlight(study.year || "");
-      tr.appendChild(tdYear);
-
-      const tdFiliere = document.createElement("td");
-      tdFiliere.innerHTML = highlight(study.filiere || "");
-      tr.appendChild(tdFiliere);
-
-      const tdProdFinal = document.createElement("td");
-      tdProdFinal.innerHTML = highlight(study.product_final || "");
-      tr.appendChild(tdProdFinal);
-
-      const tdRegionStudy = document.createElement("td");
-      const regionText = highlight(study.regionStudy || study.region || "");
-      let targetHtml = "";
-      if (study.target) {
-        targetHtml = "<br/><span class='small-text'>" + highlight(study.target) + "</span>";
-      }
-      tdRegionStudy.innerHTML = regionText + targetHtml;
-      tr.appendChild(tdRegionStudy);
-
-      const tdActions = document.createElement("td");
-      tdActions.className = "col-actions";
-
-      const btnDetails = document.createElement("button");
-      btnDetails.type = "button";
-      btnDetails.className = "btn-chip btn-chip-info";
-      btnDetails.innerHTML = '<span class="icon">🔍</span><span>Détails</span>';
-      btnDetails.addEventListener("click", () => openDetailModal(realIndex));
-
-      const btnEdit = document.createElement("button");
-      btnEdit.type = "button";
-      btnEdit.className = "btn-chip btn-chip-edit";
-      btnEdit.innerHTML = '<span class="icon">✏️</span><span>Éditer</span>';
-      btnEdit.addEventListener("click", () => onEdit(realIndex));
-
-      const btnCopy = document.createElement("button");
-      btnCopy.type = "button";
-      btnCopy.className = "btn-chip btn-chip-neutral";
-      btnCopy.innerHTML = '<span class="icon">📄</span><span>Dupliquer</span>';
-      btnCopy.addEventListener("click", () => onDuplicate(realIndex));
-
-      const btnDelete = document.createElement("button");
-      btnDelete.type = "button";
-      btnDelete.className = "btn-chip btn-chip-danger";
-      btnDelete.innerHTML = '<span class="icon">🗑️</span><span>Supprimer</span>';
-      btnDelete.addEventListener("click", () => onDelete(realIndex));
-
-      tdActions.appendChild(btnDetails);
-      tdActions.appendChild(btnEdit);
-      tdActions.appendChild(btnCopy);
-      tdActions.appendChild(btnDelete);
-      tr.appendChild(tdActions);
-
-      tbody.appendChild(tr);
-    });
-  }
-
-  // Produits : synthèse par filière & produit final
-  function updateProductsFiliereFilterOptions(entries) {
-    if (!productsFilterFiliereSelect) return;
-    const current = productsFilterFiliereSelect.value;
-    const set = new Set();
-    entries.forEach(e => {
-      const f = (e.filiere || "").trim();
-      if (f) set.add(f);
-    });
-
-    productsFilterFiliereSelect.innerHTML = "";
-    const optAll = document.createElement("option");
-    optAll.value = "";
-    optAll.textContent = "Toutes les filières";
-    productsFilterFiliereSelect.appendChild(optAll);
-
-    Array.from(set).sort((a, b) => a.localeCompare(b)).forEach(f => {
-      const opt = document.createElement("option");
-      opt.value = f;
-      opt.textContent = f;
-      productsFilterFiliereSelect.appendChild(opt);
-    });
-
-    if (set.has(current)) {
-      productsFilterFiliereSelect.value = current;
-    } else {
-      productsFilterFiliereSelect.value = "";
-    }
-  }
-
-  function renderProductsTable() {
-    if (!productsTbody) return;
-    productsTbody.innerHTML = "";
-
-    const map = {};
-    studies.forEach((s, index) => {
-      const fil = (s.filiere || "").trim();
-      const prod = (s.product_final || "").trim();
-      if (!fil && !prod) return;
-      const key = fil.toLowerCase() + "|" + prod.toLowerCase();
-      if (!map[key]) {
-        map[key] = {
-          filiere: fil,
-          product_final: prod,
-          regions: new Set(),
-          processes: [],
-          indexes: []
-        };
-      }
-      map[key].indexes.push(index);
-
-      const regionLabel = (s.regionStudy || s.region || "").trim();
-      if (regionLabel) {
-        map[key].regions.add(regionLabel);
-      }
-
-      // Processus : uniquement le résumé de la fiche
-      const summaryText = (s.summary || "").trim();
-      if (summaryText) {
-        map[key].processes.push(summaryText);
-      }
-    });
-
-    let entries = Object.values(map);
-    if (!entries.length) {
-      const tr = document.createElement("tr");
-      const td = document.createElement("td");
-      td.colSpan = 5;
-      td.className = "no-data";
-      td.textContent = "Aucun produit n’est disponible dans les fiches pour le moment.";
-      tr.appendChild(td);
-      productsTbody.appendChild(tr);
-      return;
-    }
-
-    // Met à jour la liste des filières possibles
-    updateProductsFiliereFilterOptions(entries);
-
-    const filFilter = productsFilterFiliereSelect ? productsFilterFiliereSelect.value : "";
-
-    // Tri par filière / produit pour un affichage stable
-    entries.sort((a, b) => {
-      const fa = (a.filiere || "").toLowerCase();
-      const fb = (b.filiere || "").toLowerCase();
-      if (fa < fb) return -1;
-      if (fa > fb) return 1;
-      const pa = (a.product_final || "").toLowerCase();
-      const pb = (b.product_final || "").toLowerCase();
-      if (pa < pb) return -1;
-      if (pa > pb) return 1;
-      return 0;
-    });
-
-    const toDisplay = entries.filter(entry => {
-      if (!filFilter) return true;
-      return (entry.filiere || "").trim() === filFilter;
-    });
-
-    if (!toDisplay.length) {
-      const tr = document.createElement("tr");
-      const td = document.createElement("td");
-      td.colSpan = 5;
-      td.className = "no-data";
-      td.textContent = "Aucun produit ne correspond à ce filtre.";
-      tr.appendChild(td);
-      productsTbody.appendChild(tr);
-      return;
-    }
-
-    toDisplay.forEach(entry => {
-      const tr = document.createElement("tr");
-
-      const tdFil = document.createElement("td");
-      tdFil.textContent = entry.filiere || "";
-      const tdProd = document.createElement("td");
-      tdProd.textContent = entry.product_final || "";
-
-      const tdReg = document.createElement("td");
-      const regionsArr = Array.from(entry.regions);
-      tdReg.innerHTML = regionsArr.length
-        ? regionsArr.map(r => escapeHtml(r)).join(", ")
-        : "<span class='small-text'>—</span>";
-
-      const tdProc = document.createElement("td");
-      if (entry.processes.length) {
-        const combined = entry.processes[0];
-        tdProc.innerHTML = escapeHtml(truncate(combined, 220)).replace(/\n/g, "<br>");
-      } else {
-        tdProc.innerHTML = "<span class='small-text'>—</span>";
-      }
-
-      const tdSources = document.createElement("td");
-      if (entry.indexes && entry.indexes.length) {
-        const btn = document.createElement("button");
-        btn.type = "button";
-        btn.className = "btn-chip btn-chip-info";
-        btn.innerHTML =
-          '<span class="icon">📑</span><span>' +
-          entry.indexes.length +
-          " fiche(s)</span>";
-        btn.addEventListener("click", () => openProductSourcesModal(entry));
-        tdSources.appendChild(btn);
-      } else {
-        tdSources.innerHTML = "<span class='small-text'>—</span>";
-      }
-
-      tr.appendChild(tdFil);
-      tr.appendChild(tdProd);
-      tr.appendChild(tdReg);
-      tr.appendChild(tdProc);
-      tr.appendChild(tdSources);
-
-      productsTbody.appendChild(tr);
-    });
-  }
-
-  // Stats helpers
-  function buildCountMap(values) {
-    const map = {};
-    values.forEach(v => {
-      const key = (v || "").trim();
-      if (!key) return;
-      map[key] = (map[key] || 0) + 1;
-    });
-    return map;
-  }
-
-  function renderStatsTable(tbodyEl, countMap) {
-    if (!tbodyEl) return;
-    tbodyEl.innerHTML = "";
-    const entries = Object.entries(countMap).sort((a,b) => b[1] - a[1]);
-    if (!entries.length) {
-      const tr = document.createElement("tr");
-      const td = document.createElement("td");
-      td.colSpan = 2;
-      td.className = "no-data";
-      td.textContent = "Aucune donnée disponible.";
-      tr.appendChild(td);
-      tbodyEl.appendChild(tr);
-      return;
-    }
-    let total = 0;
-    entries.forEach(([label, count]) => {
-      total += count;
-      const tr = document.createElement("tr");
-      const tdLabel = document.createElement("td");
-      const tdCount = document.createElement("td");
-      tdLabel.textContent = label;
-      tdCount.textContent = String(count);
-      tr.appendChild(tdLabel);
-      tr.appendChild(tdCount);
-      tbodyEl.appendChild(tr);
-    });
-
-    const trTotal = document.createElement("tr");
-    const tdLabelTotal = document.createElement("td");
-    const tdCountTotal = document.createElement("td");
-    tdLabelTotal.textContent = "Total";
-    tdLabelTotal.style.fontWeight = "600";
-    tdCountTotal.textContent = String(total);
-    tdCountTotal.style.fontWeight = "600";
-    trTotal.appendChild(tdLabelTotal);
-    trTotal.appendChild(tdCountTotal);
-    tbodyEl.appendChild(trTotal);
-  }
-
-  function renderBarChart(containerEl, countMap, onClickLabel) {
-    if (!containerEl) return;
-    containerEl.innerHTML = "";
-    const entries = Object.entries(countMap).sort((a, b) => b[1] - a[1]);
-    if (!entries.length) {
-      const div = document.createElement("div");
-      div.className = "no-data";
-      div.textContent = "Aucune donnée disponible.";
-      containerEl.appendChild(div);
-      return;
-    }
-    const max = entries[0][1];
-    entries.forEach(([label, count]) => {
-      const row = document.createElement("div");
-      row.className = "chart-row";
-
-      const labelDiv = document.createElement("div");
-      labelDiv.className = "chart-label";
-      labelDiv.textContent = label;
-
-      const barWrapper = document.createElement("div");
-      barWrapper.className = "chart-bar-wrapper";
-
-      const bar = document.createElement("div");
-      bar.className = "chart-bar";
-      const width = (count / max) * 100;
-      bar.style.width = width + "%";
-
-      const valueSpan = document.createElement("span");
-      valueSpan.className = "chart-value";
-      valueSpan.textContent = String(count);
-
-      barWrapper.appendChild(bar);
-      barWrapper.appendChild(valueSpan);
-
-      row.appendChild(labelDiv);
-      row.appendChild(barWrapper);
-
-      if (typeof onClickLabel === "function") {
-        row.addEventListener("click", () => {
-          onClickLabel(label);
-        });
-      }
-
-      containerEl.appendChild(row);
-    });
-  }
-
-  // Découpage des filières pour les stats
-  function extractFilieresForStats(str) {
-    if (!str) return [];
-    return str
-      .split(/[;,/]/)
-      .map(part => {
-        let s = part.trim();
-        if (!s) return "";
-
-        // retirer "etc." ou "etc"
-        s = s.replace(/\betc\.?\b/gi, "");
-
-        // retirer le texte entre parenthèses
-        s = s.replace(/\(.*?\)/g, "");
-
-        // retirer toutes parenthèses restantes
-        s = s.replace(/[()]/g, "");
-
-        // nettoyer ponctuation et tirets au début/à la fin
-        s = s.replace(/^[\s\-–—:,.]+/, "");
-        s = s.replace(/[\s\-–—:,.]+$/, "");
-
-        s = s.trim();
-        if (!s) return "";
-
-        // compresser les espaces multiples
-        s = s.replace(/\s+/g, " ");
-
-        // Normaliser les majuscules : première lettre de chaque mot
-        s = s
-          .split(" ")
-          .map(w => {
-            if (!w) return "";
-            return w.charAt(0).toUpperCase() + w.slice(1).toLowerCase();
-          })
-          .join(" ");
-
-        return s;
-      })
-      .filter(Boolean);
-  }
-
-  // Découpage des régions pour les stats : chaque région officielle comptée individuellement
-  function extractRegionsForStats(str) {
-    const text = (str || "").toLowerCase();
-    if (!text) return [];
-    const found = new Set();
-    MG_REGIONS.forEach(region => {
-      const rl = region.toLowerCase();
-      if (text.includes(rl)) {
-        found.add(region);
-      }
-    });
-    return Array.from(found);
-  }
-
-  function renderStats() {
-    // Régions : éclatement des combinaisons et comptage par région officielle
-    const allRegions = [];
-    studies.forEach(s => {
-      const label = s.regionStudy || s.region || "";
-      const regions = extractRegionsForStats(label);
-      regions.forEach(r => allRegions.push(r));
-    });
-    const regionCounts = buildCountMap(allRegions);
-
-    // Filières
-    const allFilieres = [];
-    studies.forEach(s => {
-      const list = extractFilieresForStats(s.filiere || "");
-      list.forEach(v => allFilieres.push(v));
-    });
-    const filiereCounts = buildCountMap(allFilieres);
-
-    const instCounts = buildCountMap(studies.map(s => s.institution));
-
-    // Interaction : clic sur région -> filtre texte + onglet tableau
-    renderBarChart(statsRegionChart, regionCounts, (label) => {
-      if (searchInput) {
-        searchInput.value = label;
-        renderTable();
-        switchToTab("table");
-      }
-    });
-
-    // Interaction : clic sur filière -> filtre texte + onglet tableau
-    renderBarChart(statsFiliereChart, filiereCounts, (label) => {
-      if (searchInput) {
-        searchInput.value = label;
-        renderTable();
-        switchToTab("table");
-      }
-    });
-
-    renderStatsTable(statsInstitutionTableBody, instCounts);
-  }
-
-  // Export Excel
-  function exportToExcel() {
-    if (typeof XLSX === "undefined") {
-      alert("La librairie Excel n’a pas pu être chargée.");
-      return;
-    }
-    if (!studies.length) {
-      alert("Aucune fiche à exporter.");
-      return;
-    }
-    const data = studies.map(s => ({
-      titre: s.title || "",
-      institution: s.institution || "",
-      annee: s.year || "",
-      auteur: s.author || "",
-      co_auteurs: s.coauthors || "",
-      email: s.email || "",
-      telephone: s.phone || "",
-      categorie_scientifique: s.domain || "",
-      filiere: s.filiere || "",
-      produit_final: s.product_final || "",
-      region_etude: s.regionStudy || s.region || "",
-      zone_etude: s.zoneStudy || "",
-      region_chercheur: s.regionResearcher || "",
-      groupe_cible: s.target || "",
-      mots_cles: s.keywords || "",
-      resume: s.summary || "",
-      productions: s.products || "",
-      potentiel_vulgarisation: s.disseminationPotential || "",
-      commentaire_potentiel: s.disseminationNotes || "",
-      communications: s.communications || "",
-      liens: s.links || "",
-      autres_infos: s.other || ""
-    }));
-    const ws = XLSX.utils.json_to_sheet(data);
-    const wb = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(wb, ws, "Mikasa_nutrition");
-    XLSX.writeFile(wb, "mikasa_nutrition.xlsx");
-  }
-
-  // Import Excel
-  function importFromExcel(file) {
-    if (typeof XLSX === "undefined") {
-      alert("La librairie Excel n’a pas pu être chargée.");
-      return;
-    }
-    const reader = new FileReader();
-    reader.onload = function (e) {
-      const data = new Uint8Array(e.target.result);
-      const workbook = XLSX.read(data, { type: "array" });
-
-      if (!workbook.SheetNames.length) {
-        alert("Aucune feuille trouvée dans ce fichier.");
-        return;
-      }
-
-      const sheetNames = workbook.SheetNames;
-      const chosen = prompt(
-        "Nom de la feuille à importer :\n" + sheetNames.join(", "),
-        sheetNames[0]
-      );
-      if (!chosen || !sheetNames.includes(chosen)) {
-        alert("Feuille non trouvée. Import annulé.");
-        return;
-      }
-
-      const ws = workbook.Sheets[chosen];
-      const rows = XLSX.utils.sheet_to_json(ws, { defval: "" });
-      if (!rows.length) {
-        alert("La feuille sélectionnée ne contient aucune ligne lisible.");
-        return;
-      }
-
-      const mode = importModeSelect ? importModeSelect.value : "append";
-      if (mode === "overwrite") {
-        if (!askValidationCode("écraser toutes les fiches existantes")) return;
-        studies = [];
-      }
-
-      rows.forEach(row => {
-        let cat = row.categorie_scientifique || row.domaine || row.domain || "";
-        const typeOld = row.type_recherche || row.type || "";
-        if (typeOld) {
-          if (cat && !cat.includes(typeOld)) {
-            cat = cat + " | " + typeOld;
-          } else if (!cat) {
-            cat = typeOld;
-          }
-        }
-
-        const regionEtude = row.region_etude || row.regionStudy || row.region || row.zone || "";
-        const zoneEtude = row.zone_etude || row.zoneStudy || "";
-        const regionChercheur = row.region_chercheur || row.regionResearcher || "";
-
-        const study = {
-          title: row.titre || row.title || "",
-          institution: row.institution || "",
-          year: String(row.annee || row.year || "").trim(),
-          author: row.auteur || row.author || "",
-          coauthors: row.co_auteurs || row.coauthors || "",
-          email: row.email || "",
-          phone: row.telephone || row.phone || "",
-          domain: cat || "",
-          filiere: row.filiere || "",
-          product_final: row.produit_final || row.product_final || "",
-          regionStudy: regionEtude,
-          zoneStudy: zoneEtude,
-          regionResearcher: regionChercheur,
-          target: row.groupe_cible || row.target || "",
-          keywords: row.mots_cles || row.keywords || "",
-          summary: row.resume || row.summary || "",
-          products: row.productions || row.produits_developpes || row.produits || row.products || "",
-          disseminationPotential: String(row.potentiel_vulgarisation || row.disseminationPotential || "").trim(),
-          disseminationNotes: row.commentaire_potentiel || row.disseminationNotes || "",
-          communications: row.communications || "",
-          links: row.liens || row.links || "",
-          other: row.autres_infos || row.other || ""
-        };
-        studies.push(study);
-      });
-
-      saveToStorage();
-      renderTable();
-      renderStats();
-      renderProductsTable();
-      alert(rows.length + " fiche(s) importée(s).");
+    const SCHEMA = {
+      id: ["id", "ID"],
+      title: ["titre", "title"],
+      year: ["annee", "year"],
+      period: ["periode_auto", "period"],
+      institution: ["institution_standardisee", "institution", "institution_pilote"],
+      author: ["auteur", "author"],
+      coauthors: ["co_auteurs", "coauthors"],
+      filiere: ["filiere"],
+      product: ["produit_final", "product_final"],
+      scientificCategory: ["categorie_scientifique", "domain", "domaine"],
+      themeGeneral: ["theme_general_v2", "domaine_principal_auto"],
+      themeDetail: ["theme_detaille_v2"],
+      strategicTheme: ["theme_interet_strategique"],
+      secondaryTheme1: ["theme_secondaire_1_v2"],
+      secondaryTheme2: ["theme_secondaire_2_v2"],
+      researchObject: ["objet_recherche_v2"],
+      approach: ["type_demarche_v2", "type_recherche_auto"],
+      orientation: ["orientation_recherche_v2"],
+      nutritionProblem: ["probleme_nutritionnel_v2"],
+      pnnAxis: ["axe_pnn_pnamn_v2"],
+      pnnLink: ["lien_pnn_pnamn_v2"],
+      priorityPopulation: ["population_prioritaire_v2", "population_cible_auto", "groupe_cible", "target"],
+      priorityZone: ["zone_prioritaire_v2", "region_etude_std_auto"],
+      studyRegion: ["region_etude", "regionStudy", "region"],
+      studyZone: ["zone_etude", "zoneStudy"],
+      keywords: ["mots_cles", "keywords"],
+      summary: ["resume", "summary"],
+      productions: ["productions", "type_livrable_auto", "products"],
+      deliverableAvailable: ["livrable_disponible_auto"],
+      disseminationPotential: ["potentiel_vulgarisation", "disseminationPotential"],
+      exploitation: ["niveau_exploitabilite_v2", "exploitabilite_auto"],
+      capitalization: ["potentiel_capitalisation_v2"],
+      gap: ["type_lacune_auto_v2"],
+      verificationPriority: ["priorite_verification_v2"],
+      communications: ["communications"],
+      links: ["liens", "links"],
+      notes: ["commentaire_recodage_v2", "autres_infos", "other"],
+      qualityAlert: ["alerte_qualite_auto"],
+      completeness: ["score_completude_auto"],
+      email: ["email"],
+      phone: ["telephone", "phone"]
     };
-    reader.readAsArrayBuffer(file);
-  }
 
-  // Dédoublonnage avec validation visuelle
-  function removeDuplicates() {
-    if (!studies.length) {
-      alert("Aucune fiche à dédoublonner.");
-      return;
-    }
-
-    if (!askValidationCode("analyser les doublons")) return;
-
-    const map = {};
-    studies.forEach((study, index) => {
-      const key =
-        (study.title || "").trim().toLowerCase() + "|" +
-        (study.institution || "").trim().toLowerCase() + "|" +
-        (study.year || "").trim();
-      if (!key.trim()) return;
-      if (!map[key]) map[key] = [];
-      map[key].push(index);
-    });
-
-    const groups = Object.values(map).filter(idxs => idxs.length > 1);
-    if (!groups.length) {
-      alert("Aucun doublon potentiel détecté sur la base (titre, institution, année).");
-      return;
-    }
-
-    if (!dedupeModal || !dedupeList) {
-      alert("Interface de dédoublonnage indisponible.");
-      return;
-    }
-
-    dedupeList.innerHTML = "";
-
-    groups.forEach((indexes) => {
-      const groupDiv = document.createElement("div");
-      groupDiv.className = "dedupe-group";
-
-      const firstStudy = studies[indexes[0]] || {};
-      const titleText = (firstStudy.title || "Sans titre");
-      const instText = (firstStudy.institution || "");
-      const yearText = (firstStudy.year || "");
-
-      const groupTitle = document.createElement("div");
-      groupTitle.className = "dedupe-group-title";
-      groupTitle.textContent = titleText + " | " + instText + " | " + yearText;
-      groupDiv.appendChild(groupTitle);
-
-      indexes.forEach((idx, pos) => {
-        const s = studies[idx];
-        if (!s) return;
-
-        const item = document.createElement("label");
-        item.className = "dedupe-item";
-
-        const cb = document.createElement("input");
-        cb.type = "checkbox";
-        cb.className = "dedupe-checkbox";
-        cb.dataset.index = String(idx);
-        // On propose par défaut la suppression des fiches après la première
-        cb.checked = pos > 0;
-
-        const info = document.createElement("div");
-        info.className = "dedupe-item-info";
-        info.innerHTML =
-          "<strong>" + escapeHtml(s.title || "Sans titre") + "</strong><br>" +
-          "<span class='small-text'>" +
-          escapeHtml(s.institution || "") +
-          (s.year ? " • " + escapeHtml(String(s.year)) : "") +
-          (s.regionStudy || s.region ? " • " + escapeHtml(s.regionStudy || s.region) : "") +
-          "</span>";
-
-        const btn = document.createElement("button");
-        btn.type = "button";
-        btn.className = "btn-chip btn-chip-info";
-        btn.innerHTML = '<span class="icon">🔍</span><span>Voir la fiche</span>';
-        btn.addEventListener("click", (e) => {
-          e.preventDefault();
-          openDetailModal(idx);
-        });
-
-        item.appendChild(cb);
-        item.appendChild(info);
-        item.appendChild(btn);
-
-        groupDiv.appendChild(item);
-      });
-
-      dedupeList.appendChild(groupDiv);
-    });
-
-    dedupeModal.classList.add("show");
-  }
-
-  function closeDedupeModal() {
-    if (dedupeModal) dedupeModal.classList.remove("show");
-  }
-
-  if (dedupeCancelBtn && dedupeModal) {
-    dedupeCancelBtn.addEventListener("click", closeDedupeModal);
-    dedupeModal.addEventListener("click", (e) => {
-      if (e.target === dedupeModal) closeDedupeModal();
-    });
-  }
-
-  if (dedupeConfirmBtn) {
-    dedupeConfirmBtn.addEventListener("click", () => {
-      const checkedBoxes = Array.from(document.querySelectorAll(".dedupe-checkbox:checked"));
-      if (!checkedBoxes.length) {
-        alert("Aucune fiche cochée pour suppression.");
-        return;
+    const DETAIL_SECTIONS = [
+      {
+        title: "Lecture rapide",
+        rows: [
+          ["Thème général", "themeGeneral"],
+          ["Thème détaillé", "themeDetail"],
+          ["Intérêt stratégique", "strategicTheme"],
+          ["Objet de recherche", "researchObject"],
+          ["Démarche", "approach"],
+          ["Orientation", "orientation"],
+          ["Problème nutritionnel", "nutritionProblem"]
+        ]
+      },
+      {
+        title: "Lien avec PNN / PNAMN",
+        rows: [
+          ["Axe PNN / PNAMN", "pnnAxis"],
+          ["Type de lien", "pnnLink"],
+          ["Population prioritaire", "priorityPopulation"],
+          ["Zone prioritaire", "priorityZone"],
+          ["Région / zone d’étude", "studyRegion"],
+          ["Précision zone", "studyZone"]
+        ]
+      },
+      {
+        title: "Produit, filière et livrables",
+        rows: [
+          ["Filière", "filiere"],
+          ["Produit final", "product"],
+          ["Productions", "productions"],
+          ["Livrable disponible", "deliverableAvailable"],
+          ["Communications", "communications"],
+          ["Liens", "links"]
+        ]
+      },
+      {
+        title: "Exploitabilité et lacunes",
+        rows: [
+          ["Exploitabilité", "exploitation"],
+          ["Potentiel de capitalisation", "capitalization"],
+          ["Lacune repérée", "gap"],
+          ["Priorité de vérification", "verificationPriority"],
+          ["Alerte qualité", "qualityAlert"],
+          ["Score de complétude", "completeness"],
+          ["Commentaire de recodage", "notes"]
+        ]
+      },
+      {
+        title: "Résumé scientifique",
+        rows: [
+          ["Catégorie scientifique", "scientificCategory"],
+          ["Mots-clés", "keywords"],
+          ["Résumé", "summary"]
+        ]
       }
+    ];
 
-      if (!askValidationCode("supprimer les doublons cochés")) return;
-
-      const indexes = Array.from(new Set(
-        checkedBoxes
-          .map(cb => parseInt(cb.dataset.index, 10))
-          .filter(i => !isNaN(i))
-      )).sort((a, b) => b - a);
-
-      if (!indexes.length) {
-        alert("Aucune fiche valide à supprimer.");
-        return;
+    const state = {
+      studies: [],
+      filtered: [],
+      activeView: "cards",
+      filters: {
+        search: "",
+        theme: "",
+        pnn: "",
+        exploit: "",
+        priority: "",
+        period: ""
       }
+    };
 
-      if (!confirm("Supprimer " + indexes.length + " fiche(s) sélectionnée(s) ?")) return;
+    const els = {
+      status: document.getElementById("status-line"),
+      excelInput: document.getElementById("excel-input"),
+      reloadDefault: document.getElementById("reload-default-btn"),
+      templateBtn: document.getElementById("template-btn"),
+      clearBtn: document.getElementById("clear-btn"),
+      search: document.getElementById("search-input"),
+      themeFilter: document.getElementById("theme-filter"),
+      pnnFilter: document.getElementById("pnn-filter"),
+      exploitFilter: document.getElementById("exploit-filter"),
+      priorityFilter: document.getElementById("priority-filter"),
+      periodFilter: document.getElementById("period-filter"),
+      resetFilters: document.getElementById("reset-filters-btn"),
+      cards: document.getElementById("cards-container"),
+      tableBody: document.getElementById("table-body"),
+      results: document.getElementById("results-count"),
+      exportFiltered: document.getElementById("export-filtered-btn"),
+      columnsList: document.getElementById("columns-list"),
+      kpiTotal: document.getElementById("kpi-total"),
+      kpiThemes: document.getElementById("kpi-themes"),
+      kpiDirect: document.getElementById("kpi-direct"),
+      kpiHigh: document.getElementById("kpi-high"),
+      chartThemes: document.getElementById("chart-themes"),
+      chartPnn: document.getElementById("chart-pnn"),
+      chartExploit: document.getElementById("chart-exploit"),
+      chartGaps: document.getElementById("chart-gaps"),
+      modal: document.getElementById("detail-modal"),
+      modalClose: document.getElementById("modal-close"),
+      modalTitle: document.getElementById("modal-title"),
+      modalMeta: document.getElementById("modal-meta"),
+      modalChips: document.getElementById("modal-chips"),
+      modalBody: document.getElementById("modal-body"),
+      toast: document.getElementById("toast")
+    };
 
-      indexes.forEach(i => {
-        if (i >= 0 && i < studies.length) {
-          studies.splice(i, 1);
+    function clean(value) {
+      if (value === null || value === undefined) return "";
+      const text = String(value).replace(/\s+/g, " ").trim();
+      if (!text || text === "26" || text.toLowerCase() === "null" || text.toLowerCase() === "undefined") return "";
+      return text;
+    }
+
+    function raw(row, aliases) {
+      for (const alias of aliases) {
+        if (Object.prototype.hasOwnProperty.call(row, alias)) {
+          const value = clean(row[alias]);
+          if (value) return value;
         }
-      });
-
-      saveToStorage();
-      renderTable();
-      renderStats();
-      renderProductsTable();
-      closeDedupeModal();
-    });
-  }
-
-  function deleteSelected() {
-    const checkboxes = Array.from(document.querySelectorAll(".row-select:checked"));
-    if (!checkboxes.length) {
-      alert("Aucune fiche sélectionnée.");
-      return;
-    }
-    if (!askValidationCode("supprimer les fiches sélectionnées")) return;
-
-    const indexes = checkboxes.map(cb => parseInt(cb.dataset.index, 10))
-      .filter(i => !isNaN(i));
-    const uniqueIdx = Array.from(new Set(indexes)).sort((a,b) => b - a);
-
-    if (!uniqueIdx.length) {
-      alert("Aucune fiche valide à supprimer.");
-      return;
-    }
-
-    if (!confirm("Supprimer " + uniqueIdx.length + " fiche(s) sélectionnée(s) ?")) return;
-
-    uniqueIdx.forEach(i => {
-      if (i >= 0 && i < studies.length) {
-        studies.splice(i, 1);
+        const lowerMatch = Object.keys(row).find(k => k.toLowerCase() === String(alias).toLowerCase());
+        if (lowerMatch) {
+          const value = clean(row[lowerMatch]);
+          if (value) return value;
+        }
       }
-    });
+      return "";
+    }
 
-    saveToStorage();
-    renderTable();
-    renderStats();
-    renderProductsTable();
-  }
+    function normalizeRow(row, index) {
+      const item = { _index: index, _raw: row };
+      Object.entries(SCHEMA).forEach(([key, aliases]) => item[key] = raw(row, aliases));
+      if (!item.id) item.id = String(index + 1);
+      if (!item.period && item.year) item.period = item.year;
+      return item;
+    }
 
-  // Écouteurs
-  if (form) {
-    form.addEventListener("submit", function (e) {
-      e.preventDefault();
+    function normalizeRows(rows) {
+      return rows
+        .map((row, index) => normalizeRow(row, index))
+        .filter(item => item.title || item.themeGeneral || item.summary);
+    }
 
-      if (!fields.title.value.trim()) {
-        alert("Merci de renseigner au moins le titre de la recherche.");
+    function escapeHtml(text) {
+      return clean(text).replace(/[&<>"']/g, ch => ({
+        "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#039;"
+      }[ch]));
+    }
+
+    function truncate(text, max = 180) {
+      const t = clean(text);
+      return t.length > max ? t.slice(0, max - 1).trim() + "…" : t;
+    }
+
+    function splitMulti(text) {
+      return clean(text)
+        .split(/\s*[;|]\s*/g)
+        .map(x => x.trim())
+        .filter(Boolean);
+    }
+
+    function unique(values) {
+      return [...new Set(values.map(clean).filter(Boolean))].sort((a, b) => a.localeCompare(b, "fr"));
+    }
+
+    function hasDirectPnn(item) {
+      return /direct/i.test(item.pnnLink || "");
+    }
+
+    function isHighExploitation(item) {
+      return /(forte?|élevée?|très bon|excellent)/i.test(item.exploitation || item.capitalization || "");
+    }
+
+    function chip(text, type = "neutral") {
+      const safe = escapeHtml(text);
+      if (!safe) return "";
+      return `<span class="chip chip-${type}">${safe}</span>`;
+    }
+
+    function notify(message) {
+      els.toast.textContent = message;
+      els.toast.classList.add("show");
+      window.clearTimeout(notify._timer);
+      notify._timer = window.setTimeout(() => els.toast.classList.remove("show"), 3300);
+    }
+
+    function setStatus(message) {
+      els.status.innerHTML = message;
+    }
+
+    function saveLocal() {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(state.studies));
+    }
+
+    function loadLocal() {
+      try {
+        const rawData = localStorage.getItem(STORAGE_KEY);
+        if (!rawData) return false;
+        const parsed = JSON.parse(rawData);
+        if (!Array.isArray(parsed) || !parsed.length) return false;
+        state.studies = parsed;
+        setStatus(`Données locales chargées : <strong>${state.studies.length}</strong> fiche(s).`);
+        refreshAll();
+        return true;
+      } catch (e) {
+        console.warn(e);
+        return false;
+      }
+    }
+
+    function pickSheet(workbook) {
+      for (const name of PREFERRED_SHEETS) {
+        if (workbook.SheetNames.includes(name)) return name;
+      }
+      return workbook.SheetNames[0];
+    }
+
+    function parseWorkbook(arrayBuffer, sourceLabel) {
+      if (typeof XLSX === "undefined") {
+        alert("La librairie XLSX n’est pas chargée. Vérifiez la connexion ou le CDN.");
         return;
       }
+      const workbook = XLSX.read(arrayBuffer, { type: "array", cellDates: false });
+      const sheetName = pickSheet(workbook);
+      const sheet = workbook.Sheets[sheetName];
+      const rows = XLSX.utils.sheet_to_json(sheet, { defval: "", raw: false });
+      state.studies = normalizeRows(rows);
+      saveLocal();
+      setStatus(`Source : <strong>${escapeHtml(sourceLabel)}</strong> · feuille <strong>${escapeHtml(sheetName)}</strong> · <strong>${state.studies.length}</strong> fiche(s) chargée(s).`);
+      refreshAll();
+      notify("Inventaire chargé avec succès.");
+    }
 
-      let editIndex = parseInt(editIndexInput.value, 10);
-      if (editIndex >= 0 && editIndex < studies.length) {
-        if (!askValidationCode("mettre à jour cette fiche")) return;
+    async function loadDefaultExcel() {
+      if (location.protocol === "file:") {
+        setStatus("Chargement automatique indisponible en ouverture locale directe. Utilisez le bouton d’import Excel, ou publiez la page sur GitHub Pages.");
+        return false;
       }
-
-      fields.products.value = buildProductsString();
-
-      const study = {};
-      for (const key in fields) {
-        study[key] = fields[key].value.trim();
+      for (const fileName of DEFAULT_EXCEL_FILES) {
+        try {
+          const response = await fetch(fileName, { cache: "no-store" });
+          if (!response.ok) continue;
+          const buffer = await response.arrayBuffer();
+          parseWorkbook(buffer, fileName);
+          return true;
+        } catch (e) {
+          console.warn("Auto-load failed for", fileName, e);
+        }
       }
+      setStatus("Aucun fichier Excel par défaut trouvé à côté de la page. Importez un Excel ou ajoutez <strong>mikasa_nutrition_BASE.xlsx</strong> au dépôt GitHub.");
+      return false;
+    }
 
-      if (editIndex >= 0 && editIndex < studies.length) {
-        studies[editIndex] = { ...studies[editIndex], ...study };
-      } else {
-        studies.push(study);
-      }
+    function readFile(file) {
+      const reader = new FileReader();
+      reader.onload = e => parseWorkbook(e.target.result, file.name);
+      reader.onerror = () => alert("Lecture du fichier impossible.");
+      reader.readAsArrayBuffer(file);
+    }
 
-      saveToStorage();
-      renderTable();
-      renderStats();
-      renderProductsTable();
-      clearForm();
-    });
-  }
-
-  if (searchInput) {
-    searchInput.addEventListener("input", () => {
-      renderTable();
-    });
-  }
-
-  if (productsFilterFiliereSelect) {
-    productsFilterFiliereSelect.addEventListener("change", () => {
-      renderProductsTable();
-    });
-  }
-
-  if (resetBtn) {
-    resetBtn.addEventListener("click", clearForm);
-  }
-
-  if (exportExcelBtn) {
-    exportExcelBtn.addEventListener("click", exportToExcel);
-  }
-
-  if (importExcelInput) {
-    importExcelInput.addEventListener("change", (e) => {
-      const file = e.target.files[0];
-      if (file) {
-        importFromExcel(file);
-        importExcelInput.value = "";
-      }
-    });
-  }
-
-  if (bulkDeleteBtn) {
-    bulkDeleteBtn.addEventListener("click", deleteSelected);
-  }
-  if (dedupeBtn) {
-    dedupeBtn.addEventListener("click", removeDuplicates);
-  }
-
-  if (selectAllCheckbox) {
-    selectAllCheckbox.addEventListener("change", () => {
-      const checked = selectAllCheckbox.checked;
-      const cbs = document.querySelectorAll(".row-select");
-      cbs.forEach(cb => {
-        cb.checked = checked;
+    function applyFilters() {
+      const f = state.filters;
+      const search = f.search.toLowerCase();
+      state.filtered = state.studies.filter(item => {
+        const haystack = [
+          item.title, item.institution, item.author, item.filiere, item.product,
+          item.themeGeneral, item.themeDetail, item.strategicTheme, item.pnnAxis,
+          item.pnnLink, item.priorityPopulation, item.priorityZone, item.studyRegion,
+          item.gap, item.summary, item.productions, item.keywords
+        ].join(" ").toLowerCase();
+        return (!search || haystack.includes(search)) &&
+          (!f.theme || item.themeGeneral === f.theme) &&
+          (!f.pnn || item.pnnAxis === f.pnn) &&
+          (!f.exploit || item.exploitation === f.exploit) &&
+          (!f.priority || item.verificationPriority === f.priority) &&
+          (!f.period || item.period === f.period);
       });
-    });
-  }
+    }
 
-  // Init
-  loadFromStorage();
-})();
-</script>
+    function populateSelect(select, values, currentValue, defaultLabel) {
+      const opts = [`<option value="">${defaultLabel}</option>`].concat(
+        unique(values).map(v => `<option value="${escapeHtml(v)}">${escapeHtml(v)}</option>`)
+      );
+      select.innerHTML = opts.join("");
+      select.value = currentValue || "";
+    }
 
+    function renderFilters() {
+      populateSelect(els.themeFilter, state.studies.map(x => x.themeGeneral), state.filters.theme, "Tous les thèmes");
+      populateSelect(els.pnnFilter, state.studies.map(x => x.pnnAxis), state.filters.pnn, "Tous les axes");
+      populateSelect(els.exploitFilter, state.studies.map(x => x.exploitation), state.filters.exploit, "Tous les niveaux");
+      populateSelect(els.priorityFilter, state.studies.map(x => x.verificationPriority), state.filters.priority, "Toutes les priorités");
+      populateSelect(els.periodFilter, state.studies.map(x => x.period), state.filters.period, "Toutes les périodes");
+    }
+
+    function renderKpis() {
+      els.kpiTotal.textContent = state.studies.length;
+      els.kpiThemes.textContent = unique(state.studies.map(x => x.themeGeneral)).length;
+      els.kpiDirect.textContent = state.studies.filter(hasDirectPnn).length;
+      els.kpiHigh.textContent = state.studies.filter(isHighExploitation).length;
+    }
+
+    function renderCards() {
+      if (!state.filtered.length) {
+        els.cards.innerHTML = `<div class="empty">Aucune fiche ne correspond aux filtres actuels.</div>`;
+        return;
+      }
+      els.cards.innerHTML = state.filtered.map(item => {
+        const chips = [
+          chip(item.themeGeneral, "green"),
+          chip(item.pnnLink || item.pnnAxis, hasDirectPnn(item) ? "blue" : "neutral"),
+          chip(item.exploitation, isHighExploitation(item) ? "green" : "amber"),
+          chip(item.verificationPriority, /forte/i.test(item.verificationPriority) ? "red" : "neutral")
+        ].filter(Boolean).join("");
+
+        const metaParts = [item.year || item.period, item.institution, item.author].filter(Boolean).join(" · ");
+        const popZone = [item.priorityPopulation, item.priorityZone || item.studyRegion].filter(Boolean).join(" · ");
+        const product = [item.filiere, item.product].filter(Boolean).join(" — ");
+
+        return `
+          <article class="study-card">
+            <div class="card-topline">${chips}</div>
+            <h3 class="study-title">${escapeHtml(item.title || "Sans titre")}</h3>
+            <div class="meta">${escapeHtml(metaParts)}</div>
+            ${item.themeDetail ? `<div class="meta"><strong>Thème détaillé :</strong> ${escapeHtml(truncate(item.themeDetail, 120))}</div>` : ""}
+            ${popZone ? `<div class="meta"><strong>Population / zone :</strong> ${escapeHtml(truncate(popZone, 120))}</div>` : ""}
+            ${product ? `<div class="meta"><strong>Filière / produit :</strong> ${escapeHtml(truncate(product, 120))}</div>` : ""}
+            <p class="summary">${escapeHtml(truncate(item.summary || item.strategicTheme || item.gap, 210))}</p>
+            <div class="card-footer">
+              <span class="meta">${escapeHtml(item.period || "")}</span>
+              <button class="small-btn" type="button" data-detail="${item._index}">Voir la fiche</button>
+            </div>
+          </article>`;
+      }).join("");
+    }
+
+    function renderTable() {
+      if (!state.filtered.length) {
+        els.tableBody.innerHTML = `<tr><td colspan="8" class="empty">Aucune fiche ne correspond aux filtres actuels.</td></tr>`;
+        return;
+      }
+      els.tableBody.innerHTML = state.filtered.map(item => `
+        <tr>
+          <td><strong>${escapeHtml(item.title || "Sans titre")}</strong></td>
+          <td>${escapeHtml(item.year || item.period)}</td>
+          <td>${escapeHtml(item.institution)}</td>
+          <td><div class="truncate-cell">${escapeHtml(item.themeGeneral)}${item.themeDetail ? " · " + escapeHtml(item.themeDetail) : ""}</div></td>
+          <td><div class="truncate-cell">${escapeHtml(item.pnnAxis)}${item.pnnLink ? " · " + escapeHtml(item.pnnLink) : ""}</div></td>
+          <td><div class="truncate-cell">${escapeHtml([item.priorityPopulation, item.priorityZone || item.studyRegion].filter(Boolean).join(" · "))}</div></td>
+          <td>${chip(item.exploitation, isHighExploitation(item) ? "green" : "amber")}</td>
+          <td><button class="small-btn" type="button" data-detail="${item._index}">Fiche</button></td>
+        </tr>
+      `).join("");
+    }
+
+    function countBy(items, key, split = false) {
+      const counts = new Map();
+      items.forEach(item => {
+        const values = split ? splitMulti(item[key]) : [item[key]];
+        values.forEach(value => {
+          const v = clean(value);
+          if (!v) return;
+          counts.set(v, (counts.get(v) || 0) + 1);
+        });
+      });
+      return [...counts.entries()].sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0], "fr"));
+    }
+
+    function renderBarChart(container, entries, onClick) {
+      if (!entries.length) {
+        container.innerHTML = `<div class="empty">Aucune donnée disponible.</div>`;
+        return;
+      }
+      const max = entries[0][1] || 1;
+      container.innerHTML = entries.slice(0, 12).map(([label, count]) => `
+        <div class="bar-row" data-label="${escapeHtml(label)}">
+          <div class="bar-label" title="${escapeHtml(label)}">${escapeHtml(label)}</div>
+          <div class="bar-track"><div class="bar-fill" style="width:${Math.max(6, (count / max) * 100)}%"></div></div>
+          <div class="bar-count">${count}</div>
+        </div>
+      `).join("");
+      if (onClick) {
+        container.querySelectorAll(".bar-row").forEach(row => {
+          row.addEventListener("click", () => onClick(row.dataset.label));
+        });
+      }
+    }
+
+    function renderInsights() {
+      renderBarChart(els.chartThemes, countBy(state.filtered, "themeGeneral"), label => {
+        state.filters.theme = label; els.themeFilter.value = label; refreshAll(false);
+      });
+      renderBarChart(els.chartPnn, countBy(state.filtered, "pnnAxis"), label => {
+        state.filters.pnn = label; els.pnnFilter.value = label; refreshAll(false);
+      });
+      renderBarChart(els.chartExploit, countBy(state.filtered, "exploitation"), label => {
+        state.filters.exploit = label; els.exploitFilter.value = label; refreshAll(false);
+      });
+      renderBarChart(els.chartGaps, countBy(state.filtered, "gap", true), label => {
+        state.filters.search = label; els.search.value = label; refreshAll(false);
+      });
+    }
+
+    function renderColumns() {
+      els.columnsList.innerHTML = ESSENTIAL_COLUMNS.map(([name, desc]) => `
+        <div class="column-item">
+          <div class="column-name">${escapeHtml(name)}</div>
+          <div class="column-desc">${escapeHtml(desc)}</div>
+        </div>
+      `).join("");
+    }
+
+    function renderResultsCount() {
+      const total = state.studies.length;
+      const shown = state.filtered.length;
+      if (!total) els.results.textContent = "Aucune donnée chargée.";
+      else els.results.textContent = `${shown} fiche(s) affichée(s) sur ${total}.`;
+    }
+
+    function refreshAll(rebuildFilters = true) {
+      applyFilters();
+      if (rebuildFilters) renderFilters();
+      renderKpis();
+      renderResultsCount();
+      renderCards();
+      renderTable();
+      renderInsights();
+      renderColumns();
+    }
+
+    function openDetail(index) {
+      const item = state.studies.find(x => Number(x._index) === Number(index));
+      if (!item) return;
+      els.modalTitle.textContent = item.title || "Détail de la fiche";
+      els.modalMeta.textContent = [item.year || item.period, item.institution, item.author].filter(Boolean).join(" · ");
+      els.modalChips.innerHTML = [
+        chip(item.themeGeneral, "green"),
+        chip(item.pnnLink || item.pnnAxis, hasDirectPnn(item) ? "blue" : "neutral"),
+        chip(item.exploitation, isHighExploitation(item) ? "green" : "amber"),
+        chip(item.verificationPriority, /forte/i.test(item.verificationPriority) ? "red" : "neutral")
+      ].filter(Boolean).join("");
+
+      els.modalBody.innerHTML = DETAIL_SECTIONS.map(section => {
+        const rows = section.rows
+          .filter(([, key]) => clean(item[key]))
+          .map(([label, key]) => detailRow(label, item[key], key))
+          .join("");
+        if (!rows) return "";
+        return `<section class="detail-section"><h3>${escapeHtml(section.title)}</h3><div class="detail-grid">${rows}</div></section>`;
+      }).join("") || `<div class="empty">Aucune information détaillée disponible pour cette fiche.</div>`;
+
+      els.modal.classList.add("show");
+    }
+
+    function detailRow(label, value, key) {
+      let html = escapeHtml(value);
+      if (key === "links") {
+        const parts = clean(value).split(/\s+/).map(part => {
+          if (/^https?:\/\//i.test(part)) {
+            const safe = escapeHtml(part);
+            return `<a href="${safe}" target="_blank" rel="noopener">${safe}</a>`;
+          }
+          return escapeHtml(part);
+        });
+        html = parts.join(" ");
+      }
+      return `<div class="detail-label">${escapeHtml(label)}</div><div class="detail-value">${html}</div>`;
+    }
+
+    function closeDetail() {
+      els.modal.classList.remove("show");
+    }
+
+    function exportFiltered() {
+      if (typeof XLSX === "undefined") return alert("La librairie XLSX n’est pas chargée.");
+      const rows = state.filtered.map(item => {
+        const row = {};
+        ESSENTIAL_COLUMNS.forEach(([col]) => {
+          const key = Object.entries(SCHEMA).find(([, aliases]) => aliases.includes(col));
+          if (key) row[col] = item[key[0]] || "";
+          else row[col] = item._raw && item._raw[col] ? item._raw[col] : "";
+        });
+        return row;
+      });
+      const ws = XLSX.utils.json_to_sheet(rows);
+      const wb = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(wb, ws, "Inventaire filtre");
+      XLSX.writeFile(wb, "mikasa_nutrition_filtre.xlsx");
+    }
+
+    function downloadTemplate() {
+      if (typeof XLSX === "undefined") return alert("La librairie XLSX n’est pas chargée.");
+      const headerRow = ESSENTIAL_COLUMNS.map(([name]) => name);
+      const helpRows = [["colonne", "utilité"]].concat(ESSENTIAL_COLUMNS.map(([name, desc]) => [name, desc]));
+      const wsData = XLSX.utils.aoa_to_sheet([headerRow]);
+      wsData["!cols"] = headerRow.map(name => ({ wch: Math.min(Math.max(name.length + 4, 16), 34) }));
+      const wsHelp = XLSX.utils.aoa_to_sheet(helpRows);
+      wsHelp["!cols"] = [{ wch: 34 }, { wch: 88 }];
+      const wb = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(wb, wsData, "BASE (2)");
+      XLSX.utils.book_append_sheet(wb, wsHelp, "Aide colonnes");
+      XLSX.writeFile(wb, "modele_mikasa_nutrition_allege.xlsx");
+    }
+
+    function clearLocal() {
+      if (!confirm("Vider les données enregistrées dans ce navigateur ?")) return;
+      localStorage.removeItem(STORAGE_KEY);
+      state.studies = [];
+      refreshAll();
+      setStatus("Données locales vidées. Importez un Excel pour recharger l’inventaire.");
+    }
+
+    function bindEvents() {
+      els.excelInput.addEventListener("change", event => {
+        const file = event.target.files && event.target.files[0];
+        if (file) readFile(file);
+        event.target.value = "";
+      });
+
+      els.reloadDefault.addEventListener("click", () => loadDefaultExcel());
+      els.templateBtn.addEventListener("click", downloadTemplate);
+      els.clearBtn.addEventListener("click", clearLocal);
+      els.exportFiltered.addEventListener("click", exportFiltered);
+
+      els.search.addEventListener("input", () => { state.filters.search = els.search.value.trim(); refreshAll(false); });
+      els.themeFilter.addEventListener("change", () => { state.filters.theme = els.themeFilter.value; refreshAll(false); });
+      els.pnnFilter.addEventListener("change", () => { state.filters.pnn = els.pnnFilter.value; refreshAll(false); });
+      els.exploitFilter.addEventListener("change", () => { state.filters.exploit = els.exploitFilter.value; refreshAll(false); });
+      els.priorityFilter.addEventListener("change", () => { state.filters.priority = els.priorityFilter.value; refreshAll(false); });
+      els.periodFilter.addEventListener("change", () => { state.filters.period = els.periodFilter.value; refreshAll(false); });
+
+      els.resetFilters.addEventListener("click", () => {
+        state.filters = { search: "", theme: "", pnn: "", exploit: "", priority: "", period: "" };
+        els.search.value = "";
+        refreshAll();
+      });
+
+      document.querySelectorAll(".tab").forEach(btn => {
+        btn.addEventListener("click", () => {
+          state.activeView = btn.dataset.view;
+          document.querySelectorAll(".tab").forEach(x => x.classList.toggle("active", x === btn));
+          document.querySelectorAll(".view").forEach(view => view.classList.toggle("active", view.id === "view-" + state.activeView));
+        });
+      });
+
+      document.body.addEventListener("click", event => {
+        const btn = event.target.closest("[data-detail]");
+        if (btn) openDetail(btn.dataset.detail);
+      });
+
+      els.modalClose.addEventListener("click", closeDetail);
+      els.modal.addEventListener("click", event => {
+        if (event.target === els.modal) closeDetail();
+      });
+      document.addEventListener("keydown", event => {
+        if (event.key === "Escape") closeDetail();
+      });
+    }
+
+    async function init() {
+      bindEvents();
+      renderColumns();
+      const loadedLocal = loadLocal();
+      if (!loadedLocal) await loadDefaultExcel();
+      refreshAll();
+    }
+
+    init();
+  })();
+  </script>
 </body>
 </html>
