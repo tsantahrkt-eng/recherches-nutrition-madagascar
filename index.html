@@ -342,6 +342,15 @@
     .notice { border-radius: 18px; padding: 13px 15px; background: rgba(221,184,86,.16); border: 1px solid rgba(201,155,46,.20); color:#594417; font-size:.9rem; line-height:1.5; }
     .notice.green { background: rgba(47,116,84,.10); border-color: rgba(47,116,84,.18); color: var(--green-900); }
     .no-data { padding: 28px; text-align:center; color:var(--muted); }
+
+    .dedupe-list { margin-top: 16px; display: grid; gap: 14px; }
+    .dedupe-group { border: 1px solid var(--line); border-radius: 18px; background: rgba(255,255,255,.72); overflow: hidden; }
+    .dedupe-group-head { padding: 13px 15px; background: linear-gradient(180deg, rgba(238,248,242,.85), rgba(255,253,247,.7)); border-bottom: 1px solid var(--line); font-weight: 900; color: var(--green-950); }
+    .dedupe-item { display: grid; grid-template-columns: auto 1fr auto; gap: 10px; align-items: start; padding: 12px 15px; border-top: 1px dashed rgba(23,59,47,.13); }
+    .dedupe-item:first-of-type { border-top: 0; }
+    .dedupe-item-title { font-weight: 850; color: var(--green-950); line-height: 1.35; }
+    .dedupe-item-meta { color: var(--muted); font-size: .83rem; margin-top: 3px; line-height: 1.45; }
+
     .hidden { display:none !important; }
 
     @media (max-width: 1080px) {
@@ -414,11 +423,12 @@
           <div class="panel-header">
             <div>
               <h2 class="panel-title">Catalogue des recherches</h2>
-              <p class="panel-text">Le tableau est volontairement allégé. Les informations détaillées sont accessibles dans la fiche de chaque recherche.</p>
+              <p class="panel-text">Les fiches sont présentées sous forme de cartes pour faciliter la lecture. La vue tableau reste disponible pour les consultations rapides.</p>
             </div>
             <div class="toolbar">
-              <button class="btn btn-soft" id="view-table-btn">Vue tableau</button>
               <button class="btn btn-soft" id="view-cards-btn">Vue cartes</button>
+              <button class="btn btn-soft" id="view-table-btn">Vue tableau</button>
+              <button class="btn btn-gold" id="dedupe-btn">Contrôle doublons</button>
             </div>
           </div>
           <div class="panel-body">
@@ -430,13 +440,13 @@
               <div class="field"><label for="filter-link">Lien PNN/PNAMN</label><select id="filter-link"><option value="">Tous</option></select></div>
             </div>
             <div class="notice green" id="catalogue-count">Aucune donnée chargée pour le moment.</div>
-            <div id="table-view" class="table-wrap" style="margin-top:14px;">
+            <div id="table-view" class="table-wrap hidden" style="margin-top:14px;">
               <table>
                 <thead><tr><th>Titre</th><th>Institution</th><th>Année</th><th>Région</th><th>Type</th><th>Population / méthode</th><th>PNN/PNAMN</th><th>Actions</th></tr></thead>
                 <tbody id="catalogue-tbody"></tbody>
               </table>
             </div>
-            <div id="cards-view" class="record-cards hidden" style="margin-top:14px;"></div>
+            <div id="cards-view" class="record-cards" style="margin-top:14px;"></div>
           </div>
         </div>
       </section>
@@ -519,7 +529,7 @@
           <div class="panel-header">
             <div>
               <h2 class="panel-title" id="form-title">Saisie ou correction d’une fiche</h2>
-              <p class="panel-text">Cette zone permet d’ajouter une fiche ou de corriger les informations descriptives. Les champs stratégiques PNN/PNAMN sont affichés dans les fiches lorsqu’ils existent, mais ne sont pas proposés à la saisie.</p>
+              <p class="panel-text">Cette zone permet d’ajouter une fiche ou de corriger les informations descriptives. Les champs d’analyse stratégique complétés par MIKASA sont visibles dans les fiches lorsqu’ils existent, mais ne sont pas proposés à la saisie.</p>
             </div>
             <button class="btn btn-soft" id="new-record-btn">Nouvelle fiche</button>
           </div>
@@ -582,7 +592,6 @@
                   <div class="field span-3"><label for="field-productions">Productions</label><textarea id="field-productions"></textarea></div>
                   <div class="field span-3"><label for="field-communications">Communications</label><textarea id="field-communications"></textarea></div>
                   <div class="field span-3"><label for="field-liens">Liens</label><textarea id="field-liens"></textarea></div>
-                  <div class="field span-3"><label for="field-autres_infos">Autres informations</label><textarea id="field-autres_infos"></textarea></div>
                 </div>
               </div>
 
@@ -611,6 +620,25 @@
         </div>
       </div>
       <div class="drawer-body" id="detail-body"></div>
+    </div>
+  </div>
+
+  <div id="dedupe-modal" class="drawer-backdrop" role="dialog" aria-modal="true">
+    <div class="drawer">
+      <div class="drawer-head">
+        <div>
+          <h2 class="drawer-title">Contrôle des doublons potentiels</h2>
+          <div class="research-meta">Les groupes sont proposés à partir du titre, de l’institution et de l’année. La suppression reste protégée par code.</div>
+        </div>
+        <div class="toolbar">
+          <button class="btn btn-primary btn-small" id="dedupe-delete-btn">Supprimer la sélection</button>
+          <button class="btn btn-soft btn-small" id="dedupe-close-btn">Fermer</button>
+        </div>
+      </div>
+      <div class="drawer-body">
+        <div class="notice green">Vérifier les fiches avant suppression. Par défaut, la première fiche de chaque groupe est conservée et les suivantes sont proposées à la suppression.</div>
+        <div id="dedupe-list" class="dedupe-list"></div>
+      </div>
     </div>
   </div>
 
@@ -674,7 +702,7 @@
     { id:"type", label:"Types de recherche", columns:["type de recherche"] },
     { id:"population", label:"Populations cibles", columns:["population_cible_principale","population_cible_secondaire"] },
     { id:"methodologie", label:"Méthodologies", columns:["methodologie_principale","methodologie_secondaire"] },
-    { id:"filiere", label:"Filières", columns:["filiere"] },
+    { id:"filiere", label:"Filières", columns:["filiere"], type:"filiere" },
     { id:"produit", label:"Produits finaux", columns:["produit_final"] },
     { id:"axe", label:"Axes PNN/PNAMN", columns:["axe_pnn_pnamn"] },
     { id:"axe_secondaire", label:"Axes secondaires", columns:["axe_secondaire"] },
@@ -686,7 +714,7 @@
 
   let records = [];
   let filteredRecords = [];
-  let currentView = "table";
+  let currentView = "cards";
   let currentDetailIndex = -1;
 
   const $ = (id) => document.getElementById(id);
@@ -720,7 +748,12 @@
     detailBody: $("detail-body"),
     detailEditBtn: $("detail-edit-btn"),
     detailDeleteBtn: $("detail-delete-btn"),
-    detailCloseBtn: $("detail-close-btn")
+    detailCloseBtn: $("detail-close-btn"),
+    dedupeBtn: $("dedupe-btn"),
+    dedupeModal: $("dedupe-modal"),
+    dedupeList: $("dedupe-list"),
+    dedupeDeleteBtn: $("dedupe-delete-btn"),
+    dedupeCloseBtn: $("dedupe-close-btn")
   };
 
   function isBadValue(value) {
@@ -756,6 +789,12 @@
     return s.split(/\s*[;|\n]+\s*/).map(v => clean(v)).filter(Boolean);
   }
 
+  function splitFilieres(value) {
+    const s = clean(value);
+    if (!s) return [];
+    return s.split(/\s*;\s*/).map(v => clean(v)).filter(Boolean);
+  }
+
   function splitRegions(value) {
     const s = clean(value);
     if (!s) return [];
@@ -782,7 +821,7 @@
     const map = new Map();
     records.forEach(r => {
       columns.forEach(col => {
-        const vals = type === "region" ? splitRegions(r[col]) : splitValues(r[col]);
+        const vals = type === "region" ? splitRegions(r[col]) : (type === "filiere" ? splitFilieres(r[col]) : splitValues(r[col]));
         vals.forEach(v => map.set(v, (map.get(v) || 0) + 1));
       });
     });
@@ -969,6 +1008,7 @@
         <div class="tag-row">${tag(r["type de recherche"], "blue")}${tag(r.lien_pnn_pnamn, "gold")}</div>
         <p class="research-summary">${esc(truncate(r.resume, 220) || "Résumé non renseigné.")}</p>
         <div class="tag-row">${splitRegions(r.region_recherche).slice(0,3).map(v=>tag(v,"gray")).join("")}</div>
+        <div class="tag-row">${splitFilieres(r.filiere).slice(0,3).map(v=>tag(v,"green")).join("")}</div>
         <div class="card-actions"><button class="btn btn-primary btn-small" data-action="detail" data-index="${index}">Ouvrir la fiche</button></div>`;
       els.cardsView.appendChild(div);
     });
@@ -1078,14 +1118,14 @@
   }
 
   function renderFormControls() {
-    renderMulti("regions-multi", "regions", "Régions de recherche", REGIONS_24, "Cas non régionalisé, national ou précision complémentaire");
+    renderMulti("regions-multi", "regions", "Régions de recherche", REGIONS_24, "À utiliser uniquement si la région n’est pas dans la liste");
     renderMulti("population-multi", "population", "Population cible", POPULATION_OPTIONS, "Autre population cible");
     renderMulti("methodology-multi", "methodology", "Méthodologie", METHODOLOGY_OPTIONS, "Autre méthodologie");
     const sel = $("field-type_recherche_select");
     sel.innerHTML = `<option value="">Non renseigné</option>` + TYPE_OPTIONS.map(v => `<option value="${esc(v)}">${esc(v)}</option>`).join("") + `<option value="__other">Autre à préciser</option>`;
   }
 
-  const SIMPLE_FIELDS = ["ID","titre","annee","auteur","co_auteurs","email","telephone","institution_standardisee","institution_pilote","institution_mere","ecole_faculte_institut","sous_composante","partenaires_associes","type_collaboration","categorie_scientifique","filiere","produit_final","mots_cles","resume","productions","communications","liens","autres_infos"];
+  const SIMPLE_FIELDS = ["ID","titre","annee","auteur","co_auteurs","email","telephone","institution_standardisee","institution_pilote","institution_mere","ecole_faculte_institut","sous_composante","partenaires_associes","type_collaboration","categorie_scientifique","filiere","produit_final","mots_cles","resume","productions","communications","liens"];
 
   function clearForm() {
     els.editingIndex.value = "-1";
@@ -1200,6 +1240,78 @@
     refreshAll();
   }
 
+  function normalizeForDedupe(value) {
+    return clean(value)
+      .toLowerCase()
+      .normalize("NFD").replace(/[\u0300-\u036f]/g, "")
+      .replace(/[^a-z0-9]+/g, " ")
+      .replace(/\s+/g, " ")
+      .trim();
+  }
+
+  function buildDuplicateGroups() {
+    const map = new Map();
+    records.forEach((r, index) => {
+      const title = normalizeForDedupe(r.titre);
+      if (!title) return;
+      const inst = normalizeForDedupe(r.institution_standardisee || r.institution_pilote || r.institution_mere);
+      const year = normalizeForDedupe(r.annee);
+      const key = [title, inst, year].join("|");
+      if (!map.has(key)) map.set(key, []);
+      map.get(key).push(index);
+    });
+    return [...map.values()].filter(group => group.length > 1);
+  }
+
+  function openDedupe() {
+    const groups = buildDuplicateGroups();
+    els.dedupeList.innerHTML = "";
+    if (!groups.length) {
+      els.dedupeList.innerHTML = `<div class="no-data">Aucun doublon potentiel détecté sur la combinaison titre, institution et année.</div>`;
+      els.dedupeModal.classList.add("show");
+      return;
+    }
+    groups.forEach((group, groupIndex) => {
+      const first = records[group[0]] || {};
+      const div = document.createElement("div");
+      div.className = "dedupe-group";
+      div.innerHTML = `<div class="dedupe-group-head">Groupe ${groupIndex + 1} • ${group.length} fiche(s) proches<br><span class="subtext">${esc(display(first.titre, "Sans titre"))}</span></div>`;
+      group.forEach((idx, pos) => {
+        const r = records[idx];
+        const item = document.createElement("label");
+        item.className = "dedupe-item";
+        item.innerHTML = `
+          <input type="checkbox" class="dedupe-check" value="${idx}" ${pos > 0 ? "checked" : ""} />
+          <div>
+            <div class="dedupe-item-title">${esc(display(r.titre, "Sans titre"))}</div>
+            <div class="dedupe-item-meta">ID ${esc(display(r.ID))} • ${esc(display(r.institution_standardisee))} • ${esc(display(r.annee))} • ${esc(display(r.region_recherche))}</div>
+          </div>
+          <button type="button" class="btn btn-soft btn-small" data-action="detail" data-index="${idx}">Voir</button>`;
+        div.appendChild(item);
+      });
+      els.dedupeList.appendChild(div);
+    });
+    els.dedupeModal.classList.add("show");
+  }
+
+  function closeDedupe() {
+    els.dedupeModal.classList.remove("show");
+  }
+
+  function deleteSelectedDuplicates() {
+    const indexes = [...document.querySelectorAll(".dedupe-check:checked")]
+      .map(cb => parseInt(cb.value, 10))
+      .filter(n => !isNaN(n));
+    const uniqueIndexes = [...new Set(indexes)].sort((a,b) => b - a);
+    if (!uniqueIndexes.length) { alert("Aucune fiche sélectionnée pour suppression."); return; }
+    if (!requireAccess("supprimer les doublons sélectionnés")) return;
+    if (!confirm("Supprimer " + uniqueIndexes.length + " fiche(s) sélectionnée(s) ?")) return;
+    uniqueIndexes.forEach(idx => { if (records[idx]) records.splice(idx, 1); });
+    saveLocal();
+    refreshAll();
+    openDedupe();
+  }
+
   function exportExcel() {
     if (typeof XLSX === "undefined") { alert("La librairie Excel n’est pas disponible."); return; }
     const rows = records.map(r => {
@@ -1226,6 +1338,10 @@
     [els.search, els.filterRegion, els.filterInstitution, els.filterType, els.filterLink].forEach(el => el.addEventListener("input", renderCatalogue));
     els.viewTableBtn.addEventListener("click", () => { currentView="table"; els.tableView.classList.remove("hidden"); els.cardsView.classList.add("hidden"); });
     els.viewCardsBtn.addEventListener("click", () => { currentView="cards"; els.cardsView.classList.remove("hidden"); els.tableView.classList.add("hidden"); });
+    els.dedupeBtn.addEventListener("click", openDedupe);
+    els.dedupeCloseBtn.addEventListener("click", closeDedupe);
+    els.dedupeModal.addEventListener("click", e => { if (e.target === els.dedupeModal) closeDedupe(); });
+    els.dedupeDeleteBtn.addEventListener("click", deleteSelectedDuplicates);
     document.addEventListener("click", e => {
       const btn = e.target.closest("[data-action='detail']");
       if (btn) openDetail(parseInt(btn.dataset.index,10));
@@ -1270,6 +1386,8 @@
   function init() {
     renderSummaryOptions();
     renderFormControls();
+    els.cardsView.classList.remove("hidden");
+    els.tableView.classList.add("hidden");
     clearForm();
     initEvents();
     if (!loadLocal()) tryAutoLoadExcel();
